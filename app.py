@@ -11,7 +11,7 @@ def security(response):
 def login():
    if request.method == 'GET':
 
-      return render_template('login.html')
+      return render_template('index.html')
 def upload():
    if request.method == 'GET':
       return send_from_directory('static', 'design.png')
