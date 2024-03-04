@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css?family=Outfit');
+h1 {
+    color: rgb(255, 133, 192);
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 38px;
+    letter-spacing: 0%;
+    text-align: left;
+
+}
+
+h2 {
+    color: rgb(255, 133, 192);
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 60px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+h3 {
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 30px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+p {
+    color: rgba(0, 0, 0, 0.65);
+    font-family: Outfit;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 23px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    place-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    width: 50%;
+    flex: 1;
+}
+
+.image-menu-container {
+    width: 50%;
+    background: rgb(255, 241, 240);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.image-menu-container img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Adjust the layout for smaller screens */
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Change to column layout for smaller screens */
+    }
+    .image-menu-container {
+        order: 1; /* Move image-menu container to the top */
+    }
+    .login-container {
+        order: 2; /* Move login container to the bottom */
+    }
+}
