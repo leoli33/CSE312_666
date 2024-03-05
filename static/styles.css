@@ -57,6 +57,7 @@ body {
 
 .image-menu-container {
     width: 50%;
+    height: 100vh;
     background: rgb(255, 241, 240);
     display: flex;
     justify-content: center;
@@ -67,17 +68,19 @@ body {
 .image-menu-container img {
     max-width: 100%;
     height: auto;
+    padding: 0;
+    margin: 0;
 }
 
 /* Adjust the layout for smaller screens */
 @media screen and (max-width: 768px) {
     .container {
-        flex-direction: column; /* Change to column layout for smaller screens */
+        flex-direction: column; 
     }
     .image-menu-container {
-        order: 1; /* Move image-menu container to the top */
+        order: 1; 
     }
     .login-container {
-        order: 2; /* Move login container to the bottom */
+        order: 2; 
     }
 }
