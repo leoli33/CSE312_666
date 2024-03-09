@@ -11,5 +11,9 @@ def security(response):
 def home():
    return render_template('index.html')
 
+@app.route('/message')
+def html():
+   return render_template('message.html')
+
 if __name__ == '__main__':
    app.run(debug=True, host='0.0.0.0', port=8080)
