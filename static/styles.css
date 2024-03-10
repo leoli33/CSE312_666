@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css?family=Outfit');
+h1 {
+    color: rgb(255, 133, 192);
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 38px;
+    letter-spacing: 0%;
+    text-align: left;
+
+}
+
+h2 {
+    color: rgb(255, 133, 192);
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 60px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+h3 {
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 30px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+p {
+    color: rgba(0, 0, 0, 0.65);
+    font-family: Outfit;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 23px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+.fp{
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.65);
+    margin-right: 30%;
+    float: right;
+    
+}
+
+.btn_l {
+    background-color: rgb(255, 173, 210);
+    border: none;
+    display: inline-block;
+    padding: 8px 18px;
+    text-align: center;
+    color: white;
+    box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.25);
+    margin-top: 5vh;
+    margin-right: 10px;
+}
+
+.btn_s {
+    display: inline-block;
+    padding: 8px 18px;
+    text-align: center;
+    box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.25);
+    margin-top: 5vh;
+    box-sizing: border-box;
+    border: 1px solid rgb(255, 133, 192);
+    background: rgb(255, 255, 255);
+    color: rgb(255, 133, 192);
+}
+
+.box_l {
+    width: 70%;
+    height: 5vh;
+    box-sizing: border-box;
+    border: 1px solid rgb(193, 187, 187);
+    background: rgb(255, 255, 255);
+    margin: auto;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    place-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    width: 38vw;
+    height: 80vh;
+    margin-top: auto;
+    margin-left: 5vw;
+    margin-right: 2vw;
+    margin-bottom: auto;
+    flex: 1;
+}
+
+.image-menu-container {
+    width: 50%;
+    height: 100vh;
+    background: rgb(255, 241, 240);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.image-menu-container img {
+    max-width: 100%;
+    height: auto;
+    padding: 0;
+    margin: 0;
+}
+
+/* 
+@media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column; 
+    }
+    .image-menu-container {
+        order: 1; 
+    }
+    .login-container {
+        order: 2; 
+    }
+} */
