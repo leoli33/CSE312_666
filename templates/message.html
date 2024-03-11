@@ -5,10 +5,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Message</title>
     <link rel="shortcut icon" type="image/x-icon" href="/static/design.png">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .chat {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; 
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .chat-messages {
+            flex: 1; 
+            overflow-y: auto; 
+        }
+        #chat-form {
+            display: flex;
+            margin-top: 20px;
+        }
+        #chat-input {
+            flex: 1;
+            margin-right: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        #send-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #send-button, #clear-button { 
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        #clear-button {
+            background-color: #007bff; 
+        }
+        .message-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .user-icon {
+            width: 30px; 
+            height: 30px; 
+            border-radius: 50%;
+            margin-right: 10px;
+            background-image: url('/static/guest_icon.png'); 
+            background-position: center; 
+            background-size: contain; 
+        }
+    </style>
 </head>
 <body>
     <div class="chat">
-
+        <div class="chat-messages" id="chat-messages">
+            <!-- Messages will be displayed here -->
+        </div>
+        <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="Type your message here...">
+            <button type="submit" id="send-button">Send</button>
+            <button type="button" id="clear-button">Clear Messages</button>
+        </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var chatForm = document.getElementById('chat-form');
+            var chatInput = document.getElementById('chat-input');
+            var chatMessages = document.getElementById('chat-messages');
+            var clearButton = document.getElementById('clear-button');
+    
+            chatForm.addEventListener('submit', function(event) {
+                event.preventDefault(); 
+    
+                var messageText = chatInput.value;
+                if (messageText.trim() !== '') {
+
+                    var fullMessage = 'Guest: ' + messageText;
+                    var messageDiv = document.createElement('div');
+                    messageDiv.classList.add('message-container');
+
+                    var userIcon = document.createElement('img');
+                    userIcon.src = '/static/guest-icon.png'; 
+                    userIcon.alt = 'User Icon';
+                    userIcon.classList.add('user-icon');
+    
+                    var messageElement = document.createElement('p');
+                    messageElement.textContent = fullMessage;
+                    
+
+                    messageDiv.appendChild(userIcon);
+                    messageDiv.appendChild(messageElement);
+                    chatMessages.appendChild(messageDiv);
+
+                    chatInput.value = '';
+                }
+            });
+    
+            clearButton.addEventListener('click', function() {
+                while (chatMessages.firstChild) {
+                    chatMessages.removeChild(chatMessages.firstChild);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
