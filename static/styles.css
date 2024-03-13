@@ -48,6 +48,8 @@ body {
     flex-wrap: wrap;
     place-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .login-container {
@@ -78,6 +80,27 @@ body {
         order: 1; /* Move image-menu container to the top */
     }
     .login-container {
-        order: 2; /* Move login container to the bottom */
+        order: 2; 
     }
+}
+
+.body-container {
+    background-color: white;
+    width: 70vw;
+    height:auto;
+    padding: 2vw;
+    overflow-y: auto;
+}
+
+.sidebar {
+    background-color: white;
+    height: 90%;
+    width: 3vw;
+    position: fixed;
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding: 10px;
+    right: 0;
+    margin-right: 4vw;
 }
