@@ -90,7 +90,8 @@ body {
     flex-wrap: wrap;
     place-items: center;
     justify-content: center;
-    background-color: white;
+    position: relative;
+    overflow: hidden;
 }
 
 .login-container {
@@ -138,16 +139,19 @@ body {
     background-color: white;
     width: 70vw;
     height:auto;
-    margin: 2vw;
+    padding: 2vw;
+    overflow-y: auto;
 }
 
 .sidebar {
     background-color: white;
     height: 90%;
-    width: 50px;
+    width: 3vw;
     position: fixed;
     z-index: 1; /* Stay on top */
     top: 0; /* Stay at the top */
     overflow-x: hidden; /* Disable horizontal scroll */
     padding: 10px;
+    right: 0;
+    margin-right: 4vw;
 }
