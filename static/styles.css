@@ -45,7 +45,7 @@ p {
     
 }
 
-.btn_l {
+.button_login {
     background-color: rgb(255, 173, 210);
     border: none;
     display: inline-block;
@@ -57,7 +57,7 @@ p {
     margin-right: 10px;
 }
 
-.btn_s {
+.button_signup {
     display: inline-block;
     padding: 8px 18px;
     text-align: center;
@@ -69,19 +69,20 @@ p {
     color: rgb(255, 133, 192);
 }
 
-.box_l {
+.box_login {
     width: 70%;
     height: 5vh;
     box-sizing: border-box;
     border: 1px solid rgb(193, 187, 187);
     background: rgb(255, 255, 255);
-    margin: auto;
+    margin-bottom: 1 vh;
 }
 
 body {
     margin: 0;
     padding: 0;
     font-family: 'Outfit', sans-serif;
+    background-color: rgb(255, 241, 240);
 }
 
 .container {
@@ -89,6 +90,7 @@ body {
     flex-wrap: wrap;
     place-items: center;
     justify-content: center;
+    background-color: white;
 }
 
 .login-container {
@@ -99,6 +101,7 @@ body {
     margin-right: 2vw;
     margin-bottom: auto;
     flex: 1;
+    background-color: white;
 }
 
 .image-menu-container {
@@ -118,10 +121,10 @@ body {
     margin: 0;
 }
 
-/* 
 @media screen and (max-width: 768px) {
     .container {
         flex-direction: column; 
+        width: 100%;
     }
     .image-menu-container {
         order: 1; 
@@ -129,4 +132,22 @@ body {
     .login-container {
         order: 2; 
     }
-} */
+}
+
+.body-container {
+    background-color: white;
+    width: 70vw;
+    height:auto;
+    margin: 2vw;
+}
+
+.sidebar {
+    background-color: white;
+    height: 90%;
+    width: 50px;
+    position: fixed;
+    z-index: 1; /* Stay on top */
+    top: 0; /* Stay at the top */
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding: 10px;
+}

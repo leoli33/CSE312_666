@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, send_from_directory
+
 from flask_socketio import SocketIO
 from pymongo import MongoClient
 
@@ -15,11 +16,19 @@ def security(response):
    return response
 
 @app.route('/')
-def home():
+def index_html():
    return render_template('index.html')
 
-@app.route('/message')
-def html():
+@app.route('/home')
+def home_html():
+    return render_template('home.html')
+
+@app.route('/post')
+def post_html():
+    return render_template('post.html')
+
+@app.route('/message', methods=['GET', 'POST', 'PUT'])
+def message_html():
    return render_template('message.html')
 
 @socketio.on("chat_message")
