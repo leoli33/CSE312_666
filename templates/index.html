@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cupid</title>
+    <title>Login</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="shortcut icon" type="image/x-icon" href="/static/design.png">
 </head>
@@ -14,16 +14,16 @@
             <h2>Looking for a Date?</h2>
             <h3>Welcome back! Please login to your account.</h3>
             <form method="post">
-                <input class= box_l type="text" placeholder="Email Address"><br>
-                <input class= box_l type="password" placeholder="Password"><br>
+                <input class= box_login type="text" placeholder="Email Address"><br>
+                <input class= box_login type="password" placeholder="Password"><br>
             </form>
             <br>
             <input type="checkbox" id="rm" name="rm" />
             <label for="rm">Remember Me</label>
             <a class="fp" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley" >Forget Password?</a>
             <form method="post">
-                <input class="btn_l" type="submit" value="Login">
-                <input class="btn_s" type="submit" value="Sign up">
+                <input class="button_login" type="submit" value="Login">
+                <input class="button_signup" type="submit" value="Sign up">
             </form>
                 
             
