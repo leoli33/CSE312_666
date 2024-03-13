@@ -9,9 +9,16 @@ def security(response):
    return response
 
 @app.route('/')
-def home():
+def index():
    return render_template('index.html')
 
+@app.route('/home')
+def home():
+    return render_template('home.html')
+
+@app.route('/post')
+def post():
+    return render_template('post.html')
 
 @app.route('/message', methods=['GET', 'POST', 'PUT'])
 def message():
