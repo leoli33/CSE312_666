@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/design.png">
+</head>
+<body>
+    <div class="container">
+        <div class="body-container">
+            <h2>Post an interesting questioin here</h2>
+            <!-- type question here -->
+            <form method="post">
+                <input type="text" placeholder="Type here"><br>
+                <input type="submit" value="Post">
+            </form>
+            <!-- this button should trigger page to allow user to answer on the same page -->
+            <form action="/answer" method="post" enctype="application/x-www-form-urlencoded">
+                <input type="submit" value="Answer">
+            </form>
+        </div>
+        <div class="sidebar">
+            <a href="profile">Profile</a>
+            <a href="message">Message</a>
+            <a href="logout">Logout</a>
+        </div>
+    </div>
+</body>
+</html>
