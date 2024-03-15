@@ -6,7 +6,7 @@ from bson import ObjectId
 from datetime import datetime
 import pymongo
 
-mongo_client = MongoClient("localhost", 27017)  # Replace with your MongoDB host and port
+mongo_client = MongoClient('mongo')
 db = mongo_client["CSE312_666"]
 chat_collection = db["Chat_room"]
 posts_collection = db["Posts"]
@@ -109,13 +109,6 @@ def message_html():
 def user_input(message):
    chat_collection.insert_one({"username": "Unauthorized_guest", "message": message})
    print(message)
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
    app.run(debug=True, host='0.0.0.0', port=8080)
