@@ -4,28 +4,358 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/design.png">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden; 
+            background-color: #f8d2d8; 
+        }
+        .container {
+            position: relative;
+            min-height: 100%;
+        }
+        .icon {
+            width: 40px;
+            height: 40px; 
+            position: absolute;
+            cursor: pointer; 
+        }
+        .user-icon {
+            left: 10px;
+            bottom: 10px;
+        }
+        .chat-icon {
+            right: 10px;
+            bottom: 10px;
+        }
+        .new-thread-icon {
+            right: 60px;
+            bottom: 10px;
+        }
+        .clear-posts-button {
+            position: absolute;
+            bottom: 10px;
+            left: 60px; 
+            padding: 5px 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .post-summary {
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: flex;
+            margin: 10px 0;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            background: #ffffff; 
+        }
+        .post-summary:hover {
+            background-color: #f9f9f9; 
+        }
+
+
+        /* Sidebar styles */
+        .sidebar {
+            display: none; 
+            position: fixed;
+            width: 25%; 
+            height: 25%; 
+            bottom: 70px; 
+            left: 10px; 
+            background: #f4f4f4;
+            z-index: 5; 
+            overflow-x: hidden; 
+            padding-top: 10px; 
+            transition: 0.5s; 
+            box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+        }
+        .closebtn {
+            position: absolute;
+            top: 0;
+            right: 15px;
+            font-size: 36px;
+            color: #131212; 
+            z-index: 6; 
+        }
+
+        .chat-sidebar {
+            display: none; 
+            position: fixed;
+            width: 15%; 
+            height: 90%; 
+            bottom: 70px; 
+            right: 20px; 
+            top: 0; 
+            background: #e2ffe8a2; 
+            z-index: 5; 
+            overflow-x: hidden;
+            padding-top: 10px;
+            transition: 0.5s; 
+            box-shadow: -2px 0 5px rgba(0,0,0,0.5); 
+        }
+        .new-thread-sidebar {
+            display: none; 
+            position: fixed;
+            width: 100%; 
+            height: 25%; 
+            bottom: 70px; 
+            left: 0; 
+            background: #f4f4f4; 
+            z-index: 5;
+            overflow-x: hidden; 
+            padding-top: 10px; 
+            transition: 0.5s; 
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.5); 
+        }
+        /* new thread side bar modification */
+
+        .new-thread-sidebar form {
+            display: flex;
+            flex-direction: column;
+            height: 90%;
+            padding: 10px;
+        }
+        .new-thread-sidebar input[type="text"], .new-thread-sidebar textarea {
+            margin-bottom: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .new-thread-sidebar input[type="text"] {
+            height: 20px; 
+        }
+        .new-thread-sidebar textarea {
+            resize: none; 
+            height: 30vh;
+        }
+        .new-thread-sidebar button {
+            padding: 10px 15px;
+            background-color: #4CAF50; 
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .new-thread-sidebar button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="body-container">
-            <h2>Post an interesting questioin here</h2>
-            <!-- type question here -->
-            <form method="post">
-                <input type="text" placeholder="Type here"><br>
-                <input type="submit" value="Post">
-            </form>
-            <!-- this button should trigger page to allow user to answer on the same page -->
-            <form action="/answer" method="post" enctype="application/x-www-form-urlencoded">
-                <input type="submit" value="Answer">
-            </form>
-        </div>
-        <div class="sidebar">
+        <img src="/static/post.png" alt="New Thread" class="icon new-thread-icon" onclick="toggleNewThreadSidebar()">
+        <img src="/static/chat.png" alt="Chat" class="icon chat-icon" id="chatIcon" onclick="toggleChatSidebar()">
+        <img src="/static/guest.png" alt="User" class="icon user-icon" id="ProfileIcon" onclick="toggleProfileSidebar()">
+        <button class="clear-posts-button" id="clearPostsButton" onclick="clearPosts()">X</button>
+
+        <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">&times;</a>
             <a href="profile">Profile</a>
             <a href="message">Message</a>
             <a href="logout">Logout</a>
         </div>
+        <div id="myChatSidebar" class="chat-sidebar">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeChatSidebar()">&times;</a>
+        </div>
+        <div id="myNewThreadSidebar" class="new-thread-sidebar">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNewThreadSidebar()">&times;</a>
+            <form id="newThreadForm">
+                <input type="text" id="newThreadTitle" placeholder="Title" />
+                <textarea id="newThreadContent" placeholder="What's happening?"></textarea>
+                <button type="submit">POST</button>
+            </form>
+        </div>
+        <div id="posts-container">
+            {% for post in posts %}
+            <div class="post-summary" data-posting-time="{{ post.posting_time }}" onclick="location.href='/posts/{{ post._id }}'">
+                <div>
+                    <h3>{{ post.title }}</h3>
+                    <p>{{ post.content_preview }}</p>
+                </div>
+                {% if post.last_reply_time %}
+                <div class="post-last-reply-time">
+                    <small>Last reply: <span class="time-ago" data-timestamp="{{ post.last_reply_time }}"></span></small>
+                </div>
+                {% else %}
+                <div class="post-last-reply-time">
+                    <small>Last reply: <span class="time-ago">0 minutes ago</span></small>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('.time-ago').forEach(function(element) {
+                var timestamp = element.getAttribute('data-timestamp');
+                var postingTime = element.closest('.post-summary').getAttribute('data-posting-time');
+                if (timestamp) {
+                    element.textContent = timeSince(new Date(timestamp)) + ' ago';
+                } else if (postingTime) {
+                    element.textContent = timeSince(new Date(postingTime)) + ' ago';
+                } else {
+                    element.textContent = 'some time ago';
+                }
+            });
+        });
+
+        document.getElementById("newThreadForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var title = document.getElementById("newThreadTitle").value;
+            var content = document.getElementById("newThreadContent").value;
+
+            fetch('/submit-post', {
+                method: 'POST',
+                body: JSON.stringify({ title: title, content: content }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.result === 'success') {
+                    var newPostSummary = document.createElement("div");
+                    newPostSummary.className = "post-summary";
+                    newPostSummary.setAttribute('data-posting-time', new Date().toISOString()); 
+                    newPostSummary.innerHTML = `
+                        <div>
+                            <h3>${title}</h3>
+                            <p>${content.split('\n')[0]}...</p> <!-- Use the truncated content for preview -->
+                        </div>
+                        <div class="post-last-reply-time">
+                            <small>Last reply: <span class="time-ago">just now</span></small>
+                        </div>
+                    `;
+                    newPostSummary.onclick = function() {
+                        window.location.href = '/posts/' + data.post_id;
+                    };
+                    document.getElementById("posts-container").appendChild(newPostSummary);
+                    document.getElementById("newThreadTitle").value = '';
+                    document.getElementById("newThreadContent").value = '';
+                    closeNewThreadSidebar();
+                } else {
+                    console.error('Failed to create the post.');
+                }
+            })
+            .catch(error => {
+                console.error('Network error:', error);
+            });
+        });
+        
+        function timeSince(date) {
+            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+            let interval = seconds / 31536000;
+
+            if (interval > 1) return Math.floor(interval) + " years";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + " months";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " days";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " hours";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " minutes";
+            return Math.floor(seconds) + " seconds";
+        }
+
+        document.querySelectorAll('.time-ago').forEach(function(element) {
+            const timestamp = element.getAttribute('data-timestamp');
+            if (timestamp) {
+                element.textContent = timeSince(timestamp) + ' ago';
+            } else {
+                element.textContent = '0 minutes ago';
+            }
+        });
+
+        //////////////////DEBUG CLEAR POST////////////////////
+        function clearPosts() {
+            if(confirm('Are you sure you want to clear all threads? This cannot be undone.')) {
+                fetch('/clear-posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.result === 'success') {
+                        // Remove all post-summary elements
+                        const summaries = document.querySelectorAll('.post-summary');
+                        summaries.forEach(summary => summary.remove());
+                        alert('All threads have been cleared.');
+                        window.location.reload(); // Refresh the page
+                    } else {
+                        console.error('Failed to clear the threads.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Network error:', error);
+                });
+            }
+        }
+        ///////////////////Profile Sidebar ////////////////////
+        function toggleProfileSidebar() {
+            var ProfileSidebar = document.getElementById("mySidebar");
+            var chatIcon = document.getElementById("ProfileIcon"); 
+            if (ProfileSidebar.style.width === "25%") {
+                ProfileSidebar.style.width = "0";
+                ProfileSidebar.style.height = "0";
+            } else {
+                ProfileSidebar.style.width = "25%";
+                ProfileSidebar.style.height = "25%"; 
+                ProfileSidebar.style.display = "block";
+            }
+        }
+        function closeSidebar() {
+            document.getElementById("mySidebar").style.width = "0"; 
+            document.getElementById("mySidebar").style.height = "0";
+
+        }
+        ///////////////////Chat Sidebar ////////////////////
+        function toggleChatSidebar() {
+            var chatSidebar = document.getElementById("myChatSidebar");
+            var chatIcon = document.getElementById("chatIcon"); 
+            if (chatSidebar.style.width === "15%") {
+                chatSidebar.style.width = "0";
+            } else {
+                chatSidebar.style.width = "15%";
+                chatSidebar.style.display = "block";
+            }
+        }
+        function closeChatSidebar() {
+            document.getElementById("myChatSidebar").style.width = "0"; 
+        }
+        ///////////////////Thread Sidebar ////////////////////
+        function toggleNewThreadSidebar() {
+            var newThreadSidebar = document.getElementById("myNewThreadSidebar");
+            if (newThreadSidebar.style.height === "35%") {
+                newThreadSidebar.style.height = "0"; 
+                newThreadSidebar.style.paddingTop = "0";
+                newThreadSidebar.style.boxShadow = "none"; 
+            } else {
+                newThreadSidebar.style.height = "35%"; 
+                newThreadSidebar.style.display = "block";
+                newThreadSidebar.style.paddingTop = "10px";
+                newThreadSidebar.style.boxShadow = "0 -2px 5px rgba(0,0,0,0.5)"; 
+            }
+        }
+        function closeNewThreadSidebar() {
+            var newThreadSidebar = document.getElementById("myNewThreadSidebar");
+            newThreadSidebar.style.height = "0"; 
+            newThreadSidebar.style.paddingTop = "0"; 
+            newThreadSidebar.style.boxShadow = "none"; 
+        }
+
+
+    </script>
 </body>
 </html>
