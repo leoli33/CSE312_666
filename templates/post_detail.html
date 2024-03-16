@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ post.title }}</title>
+    <style>
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #f8d2d8; 
+            color: #555;
+            text-decoration: none;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #e7c3ca; 
+        }
+
+        #reply-section {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background: #fff;
+            padding: 10px;
+            box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #replies-container {
+            padding: 20px;
+            background: #e9e9e9;
+        }
+
+        .reply {
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            margin-top: 10px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+        }
+
+        .time-ago {
+            color: #888; 
+        }
+
+
+    </style>
+</head>
+<body>
+    <a href="/post" class="back-button">&larr; Back</a> 
+    <div id="thread-content">
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.content }}</p>
+    </div>
+
+    <div id="replies-container">
+        <h3>Replies</h3>
+        {% for reply in replies %}
+            <div class="reply">
+                <p>{{ reply.content }}</p>
+                <small class="time-ago" data-timestamp="{{ reply.timestamp }}"></small>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div id="reply-section">
+        <h3>Leave a Reply</h3>
+        <form id="replyForm">
+            <textarea id="replyContent" placeholder="Type your reply here..."></textarea>
+            <button type="submit">Submit Reply</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('replyForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var replyContent = document.getElementById('replyContent').value;
+
+            fetch('/submit-reply', {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    threadId: '{{ post._id }}', 
+                    content: replyContent 
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === 'success') {
+                    document.getElementById('replyContent').value = '';
+                    
+                    const replyDiv = document.createElement('div');
+                    replyDiv.className = 'reply';
+                    const currentTime = new Date().toISOString();
+                    replyDiv.innerHTML = `
+                        <p>${replyContent}</p>
+                        <small class="time-ago" data-timestamp="${currentTime}"></small>
+                    `;
+                    document.getElementById('replies-container').appendChild(replyDiv);
+                    const timeAgoElement = replyDiv.querySelector('.time-ago');
+                    timeAgoElement.textContent = timeSince(currentTime);
+                    
+                } else {
+                    alert('Failed to submit reply.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+
+        function timeSince(date) {
+            var seconds = Math.floor((new Date() - new Date(date)) / 1000);
+            var interval = seconds / 31536000;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " year" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+            }
+            interval = seconds / 2592000;
+            if (interval > 1) {
+                return Math.floor(interval) + " month" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+            }
+            interval = seconds / 86400;
+            if (interval > 1) {
+                return Math.floor(interval) + " day" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+            }
+            interval = seconds / 3600;
+            if (interval > 1) {
+                return Math.floor(interval) + " hour" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+            }
+            interval = seconds / 60;
+            if (interval > 1) {
+                return Math.floor(interval) + " minute" + (Math.floor(interval) > 1 ? "s" : "") + " ago";
+            }
+            return Math.floor(seconds) + " seconds ago";
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('.time-ago').forEach(function(element) {
+                var timestamp = element.getAttribute('data-timestamp');
+                element.textContent = timeSince(timestamp);
+            });
+        });
+
+    </script>
+    
+    
+</body>
+</html>
