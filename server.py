@@ -70,7 +70,7 @@ def signup():
             else: #success
                 hashed_pass = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
                 cred_collection.insert_one({"email":email,"password":hashed_pass})
-                return redirect(url_for('index'))
+                return redirect(url_for('index_html'))
         
 
 @app.route('/login', methods=['POST'])
@@ -108,7 +108,7 @@ def login():
                     response.set_cookie('auth_token', auth_tok, max_age = 3600, httponly = True)
                     return response
             
-        return redirect(url_for('index')) #login failed
+        return redirect(url_for('index_html')) #login failed
 
 @app.route('/logout',methods = ['POST','GET'])
 def logout():
