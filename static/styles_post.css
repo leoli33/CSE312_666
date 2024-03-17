@@ -1,0 +1,143 @@
+
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden; 
+    background-color: #f8d2d8; 
+}
+.container {
+    position: relative;
+    min-height: 100%;
+}
+.icon {
+    width: 40px;
+    height: 40px; 
+    position: absolute;
+    cursor: pointer; 
+}
+.user-icon {
+    left: 10px;
+    bottom: 10px;
+}
+.chat-icon {
+    right: 10px;
+    bottom: 10px;
+}
+.new-thread-icon {
+    right: 60px;
+    bottom: 10px;
+}
+.clear-posts-button {
+    position: absolute;
+    bottom: 10px;
+    left: 60px; 
+    padding: 5px 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+}
+.post-summary {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: flex;
+    margin: 10px 0;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    background: #ffffff; 
+}
+.post-summary:hover {
+    background-color: #f9f9f9; 
+}
+
+
+/* Sidebar styles */
+.sidebar {
+    display: none; 
+    position: fixed;
+    width: 25%; 
+    height: 25%; 
+    bottom: 70px; 
+    left: 10px; 
+    background: #f4f4f4;
+    z-index: 5; 
+    overflow-x: hidden; 
+    padding-top: 10px; 
+    transition: 0.5s; 
+    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+}
+.closebtn {
+    position: absolute;
+    top: 0;
+    right: 15px;
+    font-size: 36px;
+    color: #131212; 
+    z-index: 6; 
+}
+.chat-sidebar {
+    display: none; 
+    position: fixed;
+    width: 15%; 
+    height: 90%; 
+    bottom: 70px; 
+    right: 20px; 
+    top: 0; 
+    background: #e2ffe8a2; 
+    z-index: 5; 
+    overflow-x: hidden;
+    padding-top: 10px;
+    transition: 0.5s; 
+    box-shadow: -2px 0 5px rgba(0,0,0,0.5); 
+}
+.new-thread-sidebar {
+    display: none; 
+    position: fixed;
+    width: 100%; 
+    height: 25%; 
+    bottom: 70px; 
+    left: 0; 
+    background: #f4f4f4; 
+    z-index: 5;
+    overflow-x: hidden; 
+    padding-top: 10px; 
+    transition: 0.5s; 
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.5); 
+}
+
+
+/* new thread side bar modification */
+.new-thread-sidebar form {
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    padding: 10px;
+}
+.new-thread-sidebar input[type="text"], .new-thread-sidebar textarea {
+    margin-bottom: 5px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.new-thread-sidebar input[type="text"] {
+    height: 20px; 
+}
+.new-thread-sidebar textarea {
+    resize: none; 
+    height: 30vh;
+}
+.new-thread-sidebar button {
+    padding: 10px 15px;
+    background-color: #4CAF50; 
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.new-thread-sidebar button:hover {
+    background-color: #45a049;
+}
