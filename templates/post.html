@@ -9,9 +9,9 @@
 </head>
 <body>
     <div class="container">
-        <img src="/static/post.png" alt="New Thread" class="icon new-thread-icon" onclick="toggleNewThreadSidebar()">
-        <img src="/static/chat.png" alt="Chat" class="icon chat-icon" id="chatIcon" onclick="toggleChatSidebar()">
-        <img src="/static/guest.png" alt="User" class="icon user-icon" id="ProfileIcon" onclick="toggleProfileSidebar()">
+        <img src="/static/images/post.png" alt="New Thread" class="icon new-thread-icon" onclick="toggleNewThreadSidebar()">
+        <img src="/static/images/chat.png" alt="Chat" class="icon chat-icon" id="chatIcon" onclick="toggleChatSidebar()">
+        <img src="/static/images/guest.png" alt="User" class="icon user-icon" id="ProfileIcon" onclick="toggleProfileSidebar()">
         <button class="clear-posts-button" id="clearPostsButton" onclick="clearPosts()">X</button>
 
         <div id="mySidebar" class="sidebar">
@@ -51,6 +51,6 @@
             {% endfor %}
         </div>
     </div>
-    <script src="/static/functions_post.js"></script>
+    <script src="/static/js/functions_post.js"></script>
 </body>
 </html>
