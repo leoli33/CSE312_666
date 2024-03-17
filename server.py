@@ -41,7 +41,7 @@ def home():
                 user_email = session.get("{{user_email}}", None)
                 return render_template('home.html', user_email=doc["email"])
     
-    return render_template('home_notloggedin.html')
+    return render_template('home.html', user_email='Guest')
 
 @app.route('/signup_page')
 def signup_page():
