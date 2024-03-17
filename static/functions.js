@@ -1,4 +1,3 @@
-document.addEventListener('DOMContentLoaded', function(){
     const socket = io();
     const chatMessages = document.getElementById("chat-messages");
     const clearButton = document.getElementById("clear-button");
@@ -25,9 +24,8 @@ document.addEventListener('DOMContentLoaded', function(){
         chatMessages.scrollTop = chatMessages.scrollHeight;
     });
 
-        clearButton.addEventListener('click', function() {
-            while (chatMessages.firstChild) {
-                chatMessages.removeChild(chatMessages.firstChild);
-            }
-        })
-})
+    clearButton.addEventListener('click', function() {
+        while (chatMessages.firstChild) {
+            chatMessages.removeChild(chatMessages.firstChild);
+        }
+    })
