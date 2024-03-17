@@ -1,3 +1,67 @@
+@import url('https://fonts.googleapis.com/css?family=Outfit');
+h1 {
+    color: rgb(255, 133, 192);
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 38px;
+    letter-spacing: 0%;
+    text-align: left;
+
+}
+
+h2 {
+    color: rgb(255, 133, 192);
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 60px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+h3 {
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 30px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+p {
+    color: rgba(0, 0, 0, 0.65);
+    font-family: Outfit;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 23px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+.fp{
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.65);
+    margin-right: 30%;
+    float: right;
+    
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+}
+
+.container {
+    width: 70vw;
+    display: flex;
+    flex-wrap: wrap;
+    place-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    overflow-y: auto;
+    margin: auto;
+}
 
 .back-button {
     display: inline-block;
