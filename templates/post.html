@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post</title>
     <link rel="stylesheet" type="text/css" href="/static/css/styles_post.css">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/images/design.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/icons/logo.png">
 </head>
 <body>
     <div class="container">
-        <img src="/static/post.png" alt="New Thread" class="icon new-thread-icon" onclick="toggleNewThreadSidebar()">
-        <img src="/static/chat.png" alt="Chat" class="icon chat-icon" id="chatIcon" onclick="toggleChatSidebar()">
-        <img src="/static/guest.png" alt="User" class="icon user-icon" id="ProfileIcon" onclick="toggleProfileSidebar()">
+        <img src="/static/icons/post.png" alt="New Thread" class="icon new-thread-icon" onclick="toggleNewThreadSidebar()">
+        <img src="/static/icons/messages.png" alt="Chat" class="icon chat-icon" id="chatIcon" onclick="toggleChatSidebar()">
+        <img src="/static/icons/profile.png" alt="User" class="icon user-icon" id="ProfileIcon" onclick="toggleProfileSidebar()">
+   
         <button class="clear-posts-button" id="clearPostsButton" onclick="clearPosts()">X</button>
 
         <div id="mySidebar" class="sidebar">
@@ -52,5 +53,6 @@
         </div>
     </div>
     <script src="/static/functions_post.js"></script>
+    {% include 'sidebar.html' %}
 </body>
 </html>
