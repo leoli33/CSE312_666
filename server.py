@@ -40,8 +40,6 @@ def home():
             if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
                 user_email = session.get("{{user_email}}", None)
                 return render_template('home.html', user_email=doc["email"])
-                
-                #return render_template('home.html')
     
     return render_template('home_notloggedin.html')
 
