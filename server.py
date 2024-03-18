@@ -1,7 +1,7 @@
 
-from flask import Flask, request, render_template, send_from_directory, jsonify, redirect, url_for, flash, make_response, session
+from flask import Flask, request, render_template, send_from_directory, jsonify, redirect, url_for, flash, make_response, session, session
 
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
@@ -241,13 +241,23 @@ def my_posts():
 ##################发帖子相关 function##################
 
 @app.route('/message', methods=['GET', 'POST', 'PUT'])
-def message_html():
-   return render_template('message.html')
-
+def message():
+    username = session.get('username', 'Guest') #default username = guest
+    load_messages = list(chat_collection.find()) #load message from data base into list
+    return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
+    
 @socketio.on("chat_message")
 def user_input(message):
-   chat_collection.insert_one({"username": "Unauthorized_guest", "message": message})
-   print(message)
+    sender = message["sender"]
+    messages = message["message"]
+
+    messages = messages.replace("&", "&amp")
+    messages = messages.replace("<", "&lt")
+    messages = messages.replace(">", "&gt")
+
+    chat_collection.insert_one({"username": sender, "message": messages})
+    emit("load_chat", {"username": sender, "messages": messages},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
+    print(message)
 
 if __name__ == '__main__':
    app.run(debug=True, host='0.0.0.0', port=8080)
