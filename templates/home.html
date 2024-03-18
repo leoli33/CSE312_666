@@ -8,22 +8,19 @@
     <link rel="shortcut icon" type="image/x-icon" href="/static/images/design.png">
 </head>
 <body>
+    <div class="top-nav">
+        <a href="profile">Profile</a>
+        <a href="message">Message</a>
+        <a href="/logout">Logout</a>
+    </div>
+
     <p>Welcome back, {{ user_email }}!</p>
     <div class="container">
         <div class="body-container">
             <h2>Find someone interesting here</h2>
-            <!-- update posts here -->
-
-            <!-- this button should trigger page to allow user to post something -->
-            <form action="/post" method="post" enctype="application/x-www-form-urlencoded">
-                <input type="submit" value="Post">
-            </form>
-        </div>
-        <div class="sidebar">
-            <a href="profile">Profile</a>
-            <a href="message">Message</a>
-            <a href="/logout">Logout</a>
+            <a href="/post" class="button">Post</a>
         </div>
     </div>
+    <script src="/static/js/script.js"></script>
 </body>
 </html>
