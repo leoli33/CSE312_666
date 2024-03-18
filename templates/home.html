@@ -6,6 +6,15 @@
     <title>Home</title>
     <link rel="stylesheet" type="text/css" href="/static/css/styles.css">
     <link rel="shortcut icon" type="image/x-icon" href="/static/images/design.png">
+    <script>
+        function checkLoginAndRedirect(userEmail) {
+            if (userEmail === 'Guest') {
+                alert('Please login.');
+                return false; 
+            }
+            return true; 
+        }
+    </script>
 </head>
 <body>
     <div class="top-nav">
@@ -18,7 +27,7 @@
     <div class="container">
         <div class="body-container">
             <h2>Find someone interesting here</h2>
-            <a href="/post" class="button">Post</a>
+            <a href="/post" class="button" onclick="return checkLoginAndRedirect('{{ user_email }}')">Post</a>
         </div>
     </div>
     <script src="/static/js/script.js"></script>
