@@ -165,7 +165,7 @@ def submit_post():
     author_email = session.get('user_email')
     # print("Author email at post submission:", author_email) 
     post_id = posts_collection.insert_one({'title': title, 'content': content, 'author': author_email}).inserted_id
-    return jsonify({'result': 'success', 'post_id': str(post_id)})
+    return jsonify({'result': 'success', 'post_id': str(post_id), 'author_email': author_email})
 
 @app.route('/clear-posts', methods=['POST'])
 def clear_posts():
