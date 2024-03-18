@@ -29,12 +29,13 @@ document.getElementById("newThreadForm").addEventListener("submit", function(eve
     .then(data => {
         if(data.result === 'success') {
             var newPostSummary = document.createElement("div");
+            var authorEmail = data.author_email || 'Unknown';
             newPostSummary.className = "post-summary";
             newPostSummary.setAttribute('data-posting-time', new Date().toISOString()); 
             newPostSummary.innerHTML = `
                 <div>
                     <h3>${title}</h3>
-                    <p>${content.split('\n')[0]}...</p> <!-- Use the truncated content for preview -->
+                    <p>${content.split('\n')[0]}... - Posted by: ${authorEmail}</p>
                 </div>
                 <div class="post-last-reply-time">
                     <small>Last reply: <span class="time-ago">just now</span></small>

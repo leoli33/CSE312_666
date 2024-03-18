@@ -17,7 +17,9 @@ posts_collection = db["Posts"]
 replies_collection = db['Replies']
 cred_collection = db["cred"]
 
+
 app = Flask(__name__)
+app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app)
 
 @app.after_request
@@ -77,6 +79,8 @@ def login():
 
         email = str(request.form['email'])
         password = str(request.form['password'])
+        session['user_email'] = 'user@example.com'
+        # print("default email: ", session['user_email'])
 
         for doc in cred_collection.find({},{'_id' : False}):
 
@@ -85,6 +89,8 @@ def login():
                 print(request.cookies.get('auth_token') )
 
                 #auth_cook = request.cookies.get('auth_token')
+                session['user_email'] = doc["email"]
+                # print("actual email: ", session['user_email'])
 
                 N = 20
                 auth_tok = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=N))
@@ -126,6 +132,11 @@ def logout():
 ##################发帖子相关 function##################
 @app.route('/post')
 def posts_list_html():
+    user_email = session.get('user_email', None) 
+    if not user_email:
+        flash('Please log in to see your posts.') 
+        return redirect(url_for('login'))
+    
     all_posts = list(posts_collection.find())
     for post in all_posts:
         content = post.get('content', '')
@@ -151,8 +162,10 @@ def submit_post():
     data = request.json
     title = data['title']
     content = data['content']
-    post_id = posts_collection.insert_one({'title': title, 'content': content}).inserted_id
-    return jsonify({'result': 'success', 'post_id': str(post_id)})
+    author_email = session.get('user_email')
+    # print("Author email at post submission:", author_email) 
+    post_id = posts_collection.insert_one({'title': title, 'content': content, 'author': author_email}).inserted_id
+    return jsonify({'result': 'success', 'post_id': str(post_id), 'author_email': author_email})
 
 @app.route('/clear-posts', methods=['POST'])
 def clear_posts():
@@ -168,13 +181,16 @@ def clear_posts():
 def post_detail(post_id):
     post_data = posts_collection.find_one({'_id': ObjectId(post_id)})
     if post_data:
+        author_email = post_data.get('author', 'Unknown author')
+        # print("Author email at post detail:", author_email)
         replies_data = replies_collection.find({'threadId': ObjectId(post_id)})
         replies = list(replies_data)
         for reply in replies:
             reply['timestamp'] = reply['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
-        return render_template('post_detail.html', post=post_data, replies=replies)
+        return render_template('post_detail.html', post=post_data, author=author_email, replies=replies)
     else:
         return "Post not found", 404
+
 
 @app.route('/submit-reply', methods=['POST'])
 def submit_reply():
@@ -191,6 +207,36 @@ def submit_reply():
         return jsonify({'result': 'success', 'reply_id': str(reply_id)})
     else:
         return jsonify({'result': 'error', 'message': 'Failed to insert reply'}), 500
+    
+@app.route('/my_posts')
+def my_posts():
+    user_email = session.get('user_email', None) 
+    if not user_email:
+        flash('Please log in to see your posts.') 
+        return redirect(url_for('login'))
+    
+    user_posts = list(posts_collection.find({'author': user_email}))
+
+    for post in user_posts:
+        content = post.get('content', '')
+        post['content_preview'] = content.split('\n')[0] if content else ''
+        
+        if 'timestamp' in post:
+            post['posting_time'] = post['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
+        else:
+            post['posting_time'] = post['_id'].generation_time.strftime('%Y-%m-%dT%H:%M:%SZ') 
+        
+        last_reply = replies_collection.find_one(
+            {'threadId': ObjectId(post['_id'])}, 
+            sort=[('timestamp', pymongo.DESCENDING)]
+        )
+        if last_reply:
+            post['last_reply_time'] = last_reply['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
+        else:
+            post['last_reply_time'] = post['posting_time']
+    return render_template('my_posts.html', posts=user_posts)
+
+
 
 ##################发帖子相关 function##################
 
