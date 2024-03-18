@@ -69,134 +69,57 @@ body {
     padding: 2vw;
 }
 
-.icon {
-    width: 40px;
-    height: 40px; 
-    position: absolute;
-    cursor: pointer; 
-}
-.user-icon {
-    left: 10px;
-    bottom: 10px;
-}
-.chat-icon {
-    right: 10px;
-    bottom: 10px;
-}
-.new-thread-icon {
-    right: 60px;
-    bottom: 10px;
-}
-.clear-posts-button {
-    position: absolute;
-    bottom: 10px;
-    left: 60px; 
-    padding: 5px 10px;
-    background-color: red;
-    color: white;
-    border: none;
-    cursor: pointer;
-    z-index: 10;
-}
-.post-summary {
-    cursor: pointer;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    display: flex;
-    margin: 10px 0;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-    background: #ffffff; 
-}
-.post-summary:hover {
-    background-color: #f9f9f9; 
-}
-
-
-/* Sidebar styles */
-.sidebar {
-    display: none; 
-    position: fixed;
-    width: 25%; 
-    height: 25%; 
-    bottom: 70px; 
-    left: 10px; 
-    background: #f4f4f4;
-    z-index: 5; 
-    overflow-x: hidden; 
-    padding-top: 10px; 
-    transition: 0.5s; 
-    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-}
-.closebtn {
-    position: absolute;
-    top: 0;
-    right: 15px;
-    font-size: 36px;
-    color: #131212; 
-    z-index: 6; 
-}
-.chat-sidebar {
-    display: none; 
-    position: fixed;
-    width: 15%; 
-    height: 90%; 
-    bottom: 70px; 
-    right: 20px; 
-    top: 0; 
-    background: #e2ffe8a2; 
-    z-index: 5; 
-    overflow-x: hidden;
-    padding-top: 10px;
-    transition: 0.5s; 
-    box-shadow: -2px 0 5px rgba(0,0,0,0.5); 
-}
-.new-thread-sidebar {
-    display: none; 
-    position: fixed;
-    width: 100%; 
-    height: 25%; 
-    bottom: 70px; 
-    left: 0; 
-    background: #f4f4f4; 
-    z-index: 5;
-    overflow-x: hidden; 
-    padding-top: 10px; 
-    transition: 0.5s; 
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.5); 
-}
-
-
-/* new thread side bar modification */
-.new-thread-sidebar form {
-    display: flex;
-    flex-direction: column;
-    height: 90%;
-    padding: 10px;
-}
-.new-thread-sidebar input[type="text"], .new-thread-sidebar textarea {
-    margin-bottom: 5px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-.new-thread-sidebar input[type="text"] {
-    height: 20px; 
-}
-.new-thread-sidebar textarea {
-    resize: none; 
-    height: 30vh;
-}
-.new-thread-sidebar button {
+.button {
+    display: inline-block;
     padding: 10px 15px;
-    background-color: #4CAF50; 
-    color: white;
-    border: none;
-    border-radius: 4px;
+    font-size: 16px;
     cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #f76c6c;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px #999;
+    margin-top: 20px; 
 }
-.new-thread-sidebar button:hover {
-    background-color: #45a049;
+
+.button:hover {
+    background-color: #f3c0c0;
+}
+
+.button:active {
+    background-color: #f3c0c0;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
+.top-nav {
+    background-color: #f3c0c0; 
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-end; 
+    padding: 14px 20px;
+}
+
+.top-nav a {
+    float: left; 
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    border-radius: 10px; 
+    margin-left: 10px; 
+}
+
+.top-nav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.top-nav a.active {
+    background-color: #04AA6D;
+    color: white;
 }
