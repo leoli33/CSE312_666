@@ -19,16 +19,13 @@
 <body>
     <div class="top-nav">
         <a href="/">Login</a>
-        <a href="profile">Profile</a>
-        <a href="message">Message</a>
-        <a href="/logout">Logout</a>
+        <a href="/post" class="button" onclick="return checkLoginAndRedirect('{{ user_email }}')">Post</a>
     </div>
 
     <p>Welcome back, {{ user_email }}!</p>
     <div class="container">
         <div class="body-container">
             <h2>Find someone interesting here</h2>
-            <a href="/post" class="button" onclick="return checkLoginAndRedirect('{{ user_email }}')">Post</a>
         </div>
     </div>
 
