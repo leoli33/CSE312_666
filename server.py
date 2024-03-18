@@ -43,7 +43,7 @@ def user_input(message):
     messages = messages.replace(">", "&gt")
 
     chat_collection.insert_one({"username": sender, "message": messages})
-    emit("load_chat", {"username": sender, "messages": messages},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
+    emit("load_chat", {"username": sender, "message": messages},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
 
 if __name__ == '__main__':
