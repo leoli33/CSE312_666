@@ -4,25 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/design.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/styles_home.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/icons/logo.png">
+    <script>
+        function checkLoginAndRedirect(userEmail) {
+            if (userEmail === 'Guest') {
+                alert('Please login.');
+                return false; 
+            }
+            return true; 
+        }
+    </script>
 </head>
 <body>
+    <div class="top-nav">
+        <a href="/">Login</a>
+        <a href="/post" class="button" onclick="return checkLoginAndRedirect('{{ user_email }}')">Post</a>
+    </div>
+
+    <p>Welcome back, {{ user_email }}!</p>
     <div class="container">
         <div class="body-container">
             <h2>Find someone interesting here</h2>
-            <!-- update posts here -->
-
-            <!-- this button should trigger page to allow user to post something -->
-            <form action="/post" method="post" enctype="application/x-www-form-urlencoded">
-                <input type="submit" value="Post">
-            </form>
-        </div>
-        <div class="sidebar">
-            <a href="profile">Profile</a>
-            <a href="message">Message</a>
-            <a href="logout">Logout</a>
         </div>
     </div>
+
+    {% include 'sidebar.html' %}
+    <script src="/static/js/script.js"></script>
 </body>
 </html>

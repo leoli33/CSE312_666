@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css?family=Outfit');
+h1 {
+    color: rgb(255, 133, 192);
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 38px;
+    letter-spacing: 0%;
+    text-align: left;
+
+}
+
+h2 {
+    color: rgb(255, 133, 192);
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 60px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+h3 {
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 30px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+p {
+    color: rgba(0, 0, 0, 0.65);
+    font-family: Outfit;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 23px;
+    letter-spacing: 0%;
+    text-align: left;
+}
+
+.fp{
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.65);
+    margin-right: 30%;
+    float: right;
+    
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+}
+
+.container {
+    width: 70vw;
+    display: flex;
+    flex-wrap: wrap;
+    place-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    overflow-y: auto;
+    margin: auto;
+}
+
+.body_container {
+    width: fit-content;
+    height:auto;
+    padding: 2vw;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #f76c6c;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px #999;
+    margin-top: 20px; 
+}
+
+.button:hover {
+    background-color: #f3c0c0;
+}
+
+.button:active {
+    background-color: #f3c0c0;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+}
+.top-nav {
+    background-color: #f3c0c0; 
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-end; 
+    padding: 14px 20px;
+}
+
+.top-nav a {
+    float: left; 
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    border-radius: 10px; 
+    margin-left: 10px; 
+}
+
+.top-nav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.top-nav a.active {
+    background-color: #04AA6D;
+    color: white;
+}

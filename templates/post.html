@@ -4,28 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/design.png">
+    <link rel="stylesheet" type="text/css" href="/static/css/styles_post.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/icons/logo.png">
 </head>
 <body>
+    <div class="top-nav">
+        <a href="/home">Home</a> 
+        <a href="/my_posts">My Post</a>
+        <a href="/logout">Logout</a>
+        <!-- You can add more links here if needed -->
+    </div>
     <div class="container">
-        <div class="body-container">
-            <h2>Post an interesting questioin here</h2>
-            <!-- type question here -->
-            <form method="post">
-                <input type="text" placeholder="Type here"><br>
-                <input type="submit" value="Post">
-            </form>
-            <!-- this button should trigger page to allow user to answer on the same page -->
-            <form action="/answer" method="post" enctype="application/x-www-form-urlencoded">
-                <input type="submit" value="Answer">
-            </form>
-        </div>
-        <div class="sidebar">
+        <img src="/static/icons/post.png" alt="New Thread" class="icon new-thread-icon" onclick="toggleNewThreadSidebar()">
+        <img src="/static/icons/messages.png" alt="Chat" class="icon chat-icon" id="chatIcon" onclick="toggleChatSidebar()">
+        <img src="/static/icons/profile.png" alt="User" class="icon user-icon" id="ProfileIcon" onclick="toggleProfileSidebar()">
+   
+        <button class="clear-posts-button" id="clearPostsButton" onclick="clearPosts()">X</button>
+
+        <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">&times;</a>
             <a href="profile">Profile</a>
             <a href="message">Message</a>
             <a href="logout">Logout</a>
         </div>
+        <div id="myChatSidebar" class="chat-sidebar">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeChatSidebar()">&times;</a>
+        </div>
+        <div id="myNewThreadSidebar" class="new-thread-sidebar">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNewThreadSidebar()">&times;</a>
+            <form id="newThreadForm">
+                <input type="text" id="newThreadTitle" placeholder="Title" />
+                <textarea id="newThreadContent" placeholder="What's happening?"></textarea>
+                <button type="submit">POST</button>
+            </form>
+        </div>
+        <div id="posts-container" class="post-container-top-space">
+            {% for post in posts %}
+            <div class="post-summary" data-posting-time="{{ post.posting_time }}" onclick="location.href='/posts/{{ post._id }}'">
+                <div>
+                    <h3>{{ post.title }}</h3>
+                    <p>{{ post.content_preview }} - Posted by: {{ post.author }}</p>
+                </div>
+                {% if post.last_reply_time %}
+                <div class="post-last-reply-time">
+                    <small>Last reply: <span class="time-ago" data-timestamp="{{ post.last_reply_time }}"></span></small>
+                </div>
+                {% else %}
+                <div class="post-last-reply-time">
+                    <small>No replies yet</small>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
     </div>
+    <script src="/static/js/functions_post.js"></script>
+    {% include 'sidebar.html' %}
 </body>
 </html>

@@ -1,8 +1,8 @@
-
+@import url('https://fonts.googleapis.com/css?family=Outfit');
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Outfit', sans-serif;
 }
 
 .chat {
@@ -12,7 +12,6 @@ body {
     justify-content: flex-end; 
     padding: 20px;
     box-sizing: border-box;
-    background-color:rgb(254, 227, 240);
 }
 
 .chat-messages {
@@ -31,33 +30,33 @@ body {
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 20px;
+    border-radius: 5px;
     box-sizing: border-box;
 }
 
 #send-button {
     padding: 10px 20px;
     font-size: 16px;
-    background-color:rgb(255, 133, 192);
+    background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 20px;
+    border-radius: 5px;
     cursor: pointer;
 }
 
 #send-button, #clear-button { 
     padding: 10px 20px;
     font-size: 16px;
-    background-color: rgb(255, 133, 192);
+    background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 20px;
+    border-radius: 5px;
     cursor: pointer;
     margin-left: 10px;
 }
 
 #clear-button {
-    background-color: rgb(255, 133, 192);
+    background-color: #007bff; 
 }
 
 .message-container {
