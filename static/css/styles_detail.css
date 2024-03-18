@@ -14,7 +14,11 @@
 .back-button:hover {
     background-color: #e7c3ca; 
 }
-
+.post-author {
+    font-style: italic;
+    color: #888;
+    margin-top: 20px;
+}
 #reply-section {
     position: fixed;
     left: 0;

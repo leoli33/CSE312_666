@@ -8,6 +8,10 @@
     <link rel="shortcut icon" type="image/x-icon" href="/static/images/design.png">
 </head>
 <body>
+    <div class="top-nav">
+        <a href="/home">Home</a> 
+        <!-- You can add more links here if needed -->
+    </div>
     <div class="container">
         <img src="/static/images/post.png" alt="New Thread" class="icon new-thread-icon" onclick="toggleNewThreadSidebar()">
         <img src="/static/images/chat.png" alt="Chat" class="icon chat-icon" id="chatIcon" onclick="toggleChatSidebar()">
@@ -31,12 +35,12 @@
                 <button type="submit">POST</button>
             </form>
         </div>
-        <div id="posts-container">
+        <div id="posts-container" class="post-container-top-space">
             {% for post in posts %}
             <div class="post-summary" data-posting-time="{{ post.posting_time }}" onclick="location.href='/posts/{{ post._id }}'">
                 <div>
                     <h3>{{ post.title }}</h3>
-                    <p>{{ post.content_preview }}</p>
+                    <p>{{ post.content_preview }} - Posted by: {{ post.author }}</p>
                 </div>
                 {% if post.last_reply_time %}
                 <div class="post-last-reply-time">
@@ -44,7 +48,7 @@
                 </div>
                 {% else %}
                 <div class="post-last-reply-time">
-                    <small>Last reply: <span class="time-ago">0 minutes ago</span></small>
+                    <small>No replies yet</small>
                 </div>
                 {% endif %}
             </div>

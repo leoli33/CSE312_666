@@ -17,7 +17,9 @@ posts_collection = db["Posts"]
 replies_collection = db['Replies']
 cred_collection = db["cred"]
 
+
 app = Flask(__name__)
+app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app)
 
 @app.after_request
@@ -77,6 +79,8 @@ def login():
 
         email = str(request.form['email'])
         password = str(request.form['password'])
+        session['user_email'] = 'user@example.com'
+        print("default email: ", session['user_email'])
 
         for doc in cred_collection.find({},{'_id' : False}):
 
@@ -85,6 +89,8 @@ def login():
                 print(request.cookies.get('auth_token') )
 
                 #auth_cook = request.cookies.get('auth_token')
+                session['user_email'] = doc["email"]
+                print("actual email: ", session['user_email'])
 
                 N = 20
                 auth_tok = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=N))
@@ -151,7 +157,9 @@ def submit_post():
     data = request.json
     title = data['title']
     content = data['content']
-    post_id = posts_collection.insert_one({'title': title, 'content': content}).inserted_id
+    author_email = session.get('user_email')
+    print("Author email at post submission:", author_email) 
+    post_id = posts_collection.insert_one({'title': title, 'content': content, 'author': author_email}).inserted_id
     return jsonify({'result': 'success', 'post_id': str(post_id)})
 
 @app.route('/clear-posts', methods=['POST'])
@@ -168,13 +176,16 @@ def clear_posts():
 def post_detail(post_id):
     post_data = posts_collection.find_one({'_id': ObjectId(post_id)})
     if post_data:
+        author_email = post_data.get('author', 'Unknown author')
+        print("Author email at post detail:", author_email)
         replies_data = replies_collection.find({'threadId': ObjectId(post_id)})
         replies = list(replies_data)
         for reply in replies:
             reply['timestamp'] = reply['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
-        return render_template('post_detail.html', post=post_data, replies=replies)
+        return render_template('post_detail.html', post=post_data, author=author_email, replies=replies)
     else:
         return "Post not found", 404
+
 
 @app.route('/submit-reply', methods=['POST'])
 def submit_reply():
