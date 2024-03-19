@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<script src="/static/js/home.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Home{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/home.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/icons/logo.png">
+</head>
+<body>
+    <div id="openNav">
+        <img src="/static/icons/menu.png" class="icon" onclick="sidebar_open()">
+    </div>
+
+    <div id="main">
+        
+        <div class="tab">
+            <button><a href="/home">Home</a></button>
+            <button><a href="/post">Explore</a></button>
+            <button><a href="/my_posts">My Posts</a></button>
+        </div>
+        
+        {% block content %}{% endblock %}
+
+    </div>
+    {% include 'sidebar.html' %}
+</body>
+</html>

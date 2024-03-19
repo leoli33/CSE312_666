@@ -1,35 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/styles_home.css">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/icons/logo.png">
-    <script>
-        function checkLoginAndRedirect(userEmail) {
-            if (userEmail === 'Guest') {
-                alert('Please login.');
-                return false; 
-            }
-            return true; 
-        }
-    </script>
-</head>
-<body>
-    <div class="top-nav">
-        <a href="/">Login</a>
-        <a href="/post" class="button" onclick="return checkLoginAndRedirect('{{ user_email }}')">Post</a>
-    </div>
+{% extends 'base.html' %}
 
-    <p>Welcome back, {{ user_email }}!</p>
-    <div class="container">
-        <div class="body-container">
+{% block title %}Home - Explore{% endblock %}
+
+{% block content %}
+    <div id="homeTab" class="tabcontent">
+        <div class="container">
+            <p>Welcome back, {{ user_email }}!</p>
             <h2>Find someone interesting here</h2>
         </div>
     </div>
-
-    {% include 'sidebar.html' %}
-    <script src="/static/js/script.js"></script>
-</body>
-</html>
+{% endblock %}

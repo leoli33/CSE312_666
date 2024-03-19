@@ -1,6 +1,6 @@
 <style>
-    .menu_sidebar {
-        height: 90%;
+    .sidebar {
+        height: 100%;
         width: 15%;
         position: fixed;
         z-index: 1; /* Stay on top */
@@ -11,33 +11,34 @@
         margin-right: 4vw;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for better visibility */
     }
-
-    .menu_sidebar ul {
+    
+    .sidebar ul {
         list-style-type: none;
         padding: 0;
     }
-
-    .menu_sidebar ul li {
+    
+    .sidebar ul li {
         margin-bottom: 10px;
     }
-
-    .menu_sidebar ul li a {
+    
+    .sidebar ul li a {
         text-decoration: none;
         color: #333;
         display: flex;
         align-items: center;
     }
-
+    
     .button-icon {
         margin-right: 10px; /* Adjust spacing between icon and text */
         width: 20px;
         height: 20px; 
         cursor: pointer; 
-    }
+    }    
 
 </style>
-<div class="menu_sidebar">
+<div class="sidebar" id="sidebar" style="display:none;background:white" id="mySidebar">
     <ul>
+        <li onclick="sidebar_close()"><img src="/static/icons/close.png" alt="Close" class="button-icon"></li>
         <li><a href="/home"><img src="/static/icons/home.png" alt="Home" class="button-icon"> Home</a></li>
         <li><a href="profile"><img src="/static/icons/profile.png" alt="Profile" class="button-icon"> Profile</a></li>
         <li><a href="#"><img src="/static/icons/notifications.png" alt="Notifications" class="button-icon"> Notifications</a></li>
@@ -46,3 +47,4 @@
         <li><a href="/logout"><img src="/static/icons/logout.png" alt="Log out" class="button-icon"> Log out</a></li>
     </ul>
 </div>
+<script src="/static/js/home.js"></script>

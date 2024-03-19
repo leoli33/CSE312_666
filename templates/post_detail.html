@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ post.title }}</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/styles_detail.css">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/icons/logo.png">
-</head>
-<body>
-    <a href="/post" class="back-button">&larr; Back</a> 
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
     <div id="thread-content">
         <h2>{{ post.title }}</h2>
         <p>{{ post.content }}</p>
@@ -31,10 +26,5 @@
             <button type="submit">Submit Reply</button>
         </form>
     </div>
-    
-
     <script src="/static/js/reply.js"></script>
-    
-    
-</body>
-</html>
+{% endblock %}
