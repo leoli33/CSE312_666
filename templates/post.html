@@ -4,7 +4,6 @@
 
 {% block content %}
     <div class="container">
-        <img src="/static/icons/post.png" alt="New Thread" class="icon new-thread-icon" onclick="toggleNewThreadSidebar()">
         <div id="myNewThreadSidebar" class="new-thread-sidebar">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNewThreadSidebar()">&times;</a>
             <form id="newThreadForm">
@@ -32,6 +31,7 @@
             </div>
             {% endfor %}
         </div>
+        <img src="/static/icons/post.png" alt="New Thread" class="icon new-thread-icon" onclick="toggleNewThreadSidebar()">
     </div>
     <script src="/static/js/post.js"></script>
 

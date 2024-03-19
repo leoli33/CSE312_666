@@ -3,28 +3,30 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
-    <div id="thread-content">
-        <h2>{{ post.title }}</h2>
-        <p>{{ post.content }}</p>
-        <p class="post-author">Posted by: {{ author }}</p>
-    </div>
+    <div class="container">
+        <div id="thread-content">
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.content }}</p>
+            <p class="post-author">Posted by: {{ author }}</p>
+        </div>
 
-    <div id="replies-container">
-        <h3>Replies</h3>
-        {% for reply in replies %}
-            <div class="reply">
-                <p>{{ reply.content }}</p>
-                <small class="time-ago" data-timestamp="{{ reply.timestamp }}"></small>
-            </div>
-        {% endfor %}
+        <div id="replies-container">
+            <h3>Replies</h3>
+            {% for reply in replies %}
+                <div class="reply">
+                    <p>{{ reply.content }}</p>
+                    <small class="time-ago" data-timestamp="{{ reply.timestamp }}"></small>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div id="reply-section">
+            <h3>Leave a Reply</h3>
+            <form id="replyForm">
+                <textarea id="replyContent" placeholder="Type your reply here..."></textarea>
+                <button type="submit">Submit Reply</button>
+            </form>
+        </div>
+        <script src="/static/js/reply.js"></script>
     </div>
-    
-    <div id="reply-section">
-        <h3>Leave a Reply</h3>
-        <form id="replyForm">
-            <textarea id="replyContent" placeholder="Type your reply here..."></textarea>
-            <button type="submit">Submit Reply</button>
-        </form>
-    </div>
-    <script src="/static/js/reply.js"></script>
 {% endblock %}
