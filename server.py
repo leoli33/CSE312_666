@@ -143,7 +143,7 @@ def logout():
             if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
 
                 cred_collection.update_one({"email":doc["email"] ,"password":doc["password"],"auth_token":doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], "auth_token": ""}})
-                response = make_response(redirect(url_for('home_html')))
+                response = make_response(redirect(url_for('home')))
                 response.set_cookie('auth_token', "", expires = 0, httponly = True)
                 return response
 
