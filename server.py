@@ -47,7 +47,7 @@ def home():
 
 @app.route('/signup_page')
 def signup_page():
-     return render_template('index_signup.html')
+     return render_template('register.html')
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -61,11 +61,11 @@ def signup():
 
         if cred_collection.find_one({'email': email}): #check email exists
           
-            return render_template('index_signup.html')
+            return render_template('register.html')
         else:
 
             if password != confirm_pass: #password does not match
-                return render_template('index_signup.html')
+                return render_template('register.html')
             
             else: #success
                 hashed_pass = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
