@@ -147,12 +147,12 @@
 }
 .new-thread-sidebar button {
     padding: 10px 15px;
-    background-color: #4CAF50; 
+    background-color: rgb(255, 180, 214); 
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 .new-thread-sidebar button:hover {
-    background-color: #45a049;
+    background-color: rgb(255, 133, 192);
 }
