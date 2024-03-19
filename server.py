@@ -1,5 +1,5 @@
 
-from flask import Flask, request, render_template, send_from_directory, jsonify, redirect, url_for, flash, make_response, session, session
+from flask import Flask, request, render_template, send_from_directory, jsonify, redirect, url_for, flash, make_response, session
 
 from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
@@ -25,20 +25,15 @@ socketio = SocketIO(app)
 def check_login():
     # Check if the auth token is in the session
     if 'auth_token' not in request.cookies:
-        # Redirect to the login page if the auth token is not present
-        return redirect(url_for('login'))
+        return redirect(url_for('login_page'))
     else:
         # Check if the auth token is valid (e.g., validate against database or other storage)
         auth_token = request.cookies.get('auth_token')
         if not validate_auth_token(auth_token):  # Implement this function to validate the auth token
-            return redirect(url_for('login'))
+            return redirect(url_for('login_page'))
 
 def validate_auth_token(auth_token):
-    # Implement logic to validate the auth token, e.g., check against database
     # Return True if the token is valid, False otherwise
-    # Example pseudo code:
-    # user = User.query.filter_by(auth_token=auth_token).first()
-    # return user is not None
     return True  # Placeholder, replace with actual validation logic
 
 @app.before_request
@@ -52,10 +47,6 @@ def security(response):
    return response
 
 @app.route('/')
-def index_html():
-   return render_template('index.html')
-
-@app.route('/home')
 def home():
 
     auth_cook = request.cookies.get('auth_token')
@@ -94,8 +85,11 @@ def signup():
             else: #success
                 hashed_pass = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
                 cred_collection.insert_one({"email":email,"password":hashed_pass})
-                return redirect(url_for('index_html'))
+                return redirect(url_for('login_page'))
         
+@app.route('/login_page')
+def login_page():
+    return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -136,7 +130,7 @@ def login():
                     response.set_cookie('auth_token', auth_tok, max_age = 3600, httponly = True)
                     return response
             
-        return redirect(url_for('index_html')) #login failed
+        return redirect(url_for('login_page')) #login failed
 
 @app.route('/logout',methods = ['POST','GET'])
 def logout():
@@ -149,7 +143,7 @@ def logout():
             if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
 
                 cred_collection.update_one({"email":doc["email"] ,"password":doc["password"],"auth_token":doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], "auth_token": ""}})
-                response = make_response(redirect(url_for('index_html')))
+                response = make_response(redirect(url_for('home_html')))
                 response.set_cookie('auth_token', "", expires = 0, httponly = True)
                 return response
 
@@ -159,7 +153,7 @@ def posts_list_html():
     user_email = session.get('user_email', None) 
     if not user_email:
         flash('Please log in to see your posts.') 
-        return redirect(url_for('login'))
+        return redirect(url_for('login_page'))
     
     all_posts = list(posts_collection.find())
     for post in all_posts:
@@ -237,7 +231,7 @@ def my_posts():
     user_email = session.get('user_email', None) 
     if not user_email:
         flash('Please log in to see your posts.') 
-        return redirect(url_for('login'))
+        return redirect(url_for('login_page'))
     
     user_posts = list(posts_collection.find({'author': user_email}))
 
