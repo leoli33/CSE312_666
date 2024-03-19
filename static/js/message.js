@@ -10,7 +10,7 @@ chatForm.addEventListener('submit',function(event) {
         socket.emit("chat_message", {sender: username, message: message});
         document.getElementById("chat-input").value = ""; 
     }
-})
+});
 
 socket.on("load_chat", function(data) {
     const sender = data.username;
@@ -28,4 +28,4 @@ clearButton.addEventListener('click', function() {
     while (chatMessages.firstChild) {
         chatMessages.removeChild(chatMessages.firstChild);
     }
-})
+});
