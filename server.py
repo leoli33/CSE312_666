@@ -211,7 +211,7 @@ def post_detail(post_id):
         replies = list(replies_data)
         for reply in replies:
             reply['timestamp'] = reply['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
-        return render_template('post_detail.html', post=post_data, author=author_email, replies=replies)
+        return render_template('reply.html', post=post_data, author=author_email, replies=replies)
     else:
         return "Post not found", 404
 

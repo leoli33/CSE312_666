@@ -6,9 +6,8 @@
         z-index: 1; /* Stay on top */
         top: 0; /* Stay at the top */
         overflow-x: hidden; /* Disable horizontal scroll */
-        padding: 10px;
+        padding-left: 10px;
         left: 0;
-        margin-right: 4vw;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add shadow for better visibility */
     }
     
@@ -47,7 +46,7 @@
         {% if user_email!='Guest' %}
         <li><a href="/logout"><img src="/static/icons/logout.png" alt="Log out" class="button-icon"> Log out</a></li>
         {% else %}
-        <li><a href="/login"><img src="/static/icons/login.png" alt="Log in" class="button-icon"> Log in</a></li>
+        <li><a href="/"><img src="/static/icons/login.png" alt="Log in" class="button-icon"> Log in</a></li>
         {% endif %}
     </ul>
 </div>
