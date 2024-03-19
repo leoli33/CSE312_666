@@ -16,7 +16,7 @@ function sidebar_open() {
 function sidebar_close() {
     document.getElementById("main").style.marginLeft = "0%";
     document.getElementById("sidebar").style.display = "none";
-    document.getElementById("openNav").style.display = "inline-block";
+    document.getElementById("openNav").style.display = "block";
 }
 
 function openTab(tabName) {
