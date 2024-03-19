@@ -22,6 +22,30 @@ app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app)
 
+def check_login():
+    # Check if the auth token is in the session
+    if 'auth_token' not in request.cookies:
+        # Redirect to the login page if the auth token is not present
+        return redirect(url_for('login'))
+    else:
+        # Check if the auth token is valid (e.g., validate against database or other storage)
+        auth_token = request.cookies.get('auth_token')
+        if not validate_auth_token(auth_token):  # Implement this function to validate the auth token
+            return redirect(url_for('login'))
+
+def validate_auth_token(auth_token):
+    # Implement logic to validate the auth token, e.g., check against database
+    # Return True if the token is valid, False otherwise
+    # Example pseudo code:
+    # user = User.query.filter_by(auth_token=auth_token).first()
+    # return user is not None
+    return True  # Placeholder, replace with actual validation logic
+
+@app.before_request
+def before_request():
+    # Call the function to check if the user is logged in before each request
+    check_login()
+    
 @app.after_request
 def security(response):
    response.headers['X-Content-Type-Options'] = 'nosniff'
@@ -130,7 +154,7 @@ def logout():
                 return response
 
 ##################发帖子相关 function##################
-@app.route('/post')
+@app.route('/explore')
 def posts_list_html():
     user_email = session.get('user_email', None) 
     if not user_email:
