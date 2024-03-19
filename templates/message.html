@@ -12,6 +12,11 @@
     <div class="chat">
         <div class="chat-messages" id="chat-messages">
             <!-- Messages will be displayed here -->
+            {% for message in messages %} <!--load messages from database-->
+            <div class="message-container">
+                <default>{{ message.username }}: {{ message.message }}</default> <!--in this format-->
+            </div>
+            {% endfor %}
         </div>
         <form id="chat-form">
             <input type="text" id="chat-input" placeholder="Type your message here...">

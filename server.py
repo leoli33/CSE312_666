@@ -242,9 +242,18 @@ def my_posts():
 
 @app.route('/message', methods=['GET', 'POST', 'PUT'])
 def message():
-    username = session.get('username', 'Guest') #default username = guest
-    load_messages = list(chat_collection.find()) #load message from data base into list
-    return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
+    auth_cook = request.cookies.get('auth_token')
+    for doc in cred_collection.find({},{'_id' : False}):
+        if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
+            email = doc["email"].split("@")
+            username = email[0]
+            #print(username)
+            #print(email)
+            username = session.get('username', username) #default username = guest
+            load_messages = list(chat_collection.find()) #load message from data base into list
+            return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
+        
+    return "user not associated",404
     
 @socketio.on("chat_message")
 def user_input(message):
