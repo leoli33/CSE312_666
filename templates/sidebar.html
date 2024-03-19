@@ -40,11 +40,15 @@
     <ul>
         <li onclick="sidebar_close()"><img src="/static/icons/close.png" alt="Close" class="button-icon"></li>
         <li><a href="/home"><img src="/static/icons/home.png" alt="Home" class="button-icon"> Home</a></li>
-        <li><a href="profile"><img src="/static/icons/profile.png" alt="Profile" class="button-icon"> Profile</a></li>
+        <li><a href="#"><img src="/static/icons/profile.png" alt="Profile" class="button-icon"> Profile</a></li>
         <li><a href="#"><img src="/static/icons/notifications.png" alt="Notifications" class="button-icon"> Notifications</a></li>
         <li><a href="#"><img src="/static/icons/saved_posts.png" alt="Saved posts" class="button-icon"> Saved posts</a></li>
-        <li><a href="message"><img src="/static/icons/messages.png" alt="Messages" class="button-icon"> Messages</a></li>
+        <li><a href="/message"><img src="/static/icons/messages.png" alt="Messages" class="button-icon"> Messages</a></li>
+        {% if user_email!='Guest' %}
         <li><a href="/logout"><img src="/static/icons/logout.png" alt="Log out" class="button-icon"> Log out</a></li>
+        {% else %}
+        <li><a href="/login"><img src="/static/icons/login.png" alt="Log in" class="button-icon"> Log in</a></li>
+        {% endif %}
     </ul>
 </div>
 <script src="/static/js/home.js"></script>
