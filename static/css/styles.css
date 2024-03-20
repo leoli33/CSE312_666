@@ -60,15 +60,14 @@ body {
     margin: auto;
 }
 .nav {
-    background-color: #f3c0c0; 
+    background-color: rgb(255, 180, 214); 
 }
 .tab {
     margin: auto;
-    background-color: #f3c0c0; 
+    background-color: rgb(255, 180, 214); 
     overflow: hidden;
     display: flex;
     justify-content: flex-end; 
-    padding: 14px 20px;
 }
 
 /* Style the buttons that are used to open the tab content */
@@ -90,6 +89,12 @@ body {
 /* Create an active/current tablink class */
 .tab button.active {
     background-color: #ccc;
+}
+
+.tab button a{
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: medium;
 }
 
 .icon {
