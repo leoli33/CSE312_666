@@ -102,4 +102,5 @@ body {
     height: 40px; 
     position: fixed;
     cursor: pointer; 
+    top: 3px;
 }
