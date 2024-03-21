@@ -1,6 +1,13 @@
 .post-container-top-space {
     margin-top: 50px; 
 }
+.icon {
+    width: 40px;
+    height: 40px; 
+    position: fixed;
+    cursor: pointer;
+}
+
 .user-icon {
     left: 10px;
     bottom: 10px;
