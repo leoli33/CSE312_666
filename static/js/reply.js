@@ -2,11 +2,13 @@
 document.getElementById('replyForm').addEventListener('submit', function(event) {
     event.preventDefault();
     var replyContent = document.getElementById('replyContent').value;
+    var postContainer = document.getElementById('thread-content');
+    var postId = postContainer.dataset.postId; 
 
     fetch('/submit-reply', {
         method: 'POST',
         body: JSON.stringify({ 
-            threadId: '{{ post._id }}', 
+            threadId: postId, 
             content: replyContent 
         }),
         headers: {
@@ -17,18 +19,20 @@ document.getElementById('replyForm').addEventListener('submit', function(event) 
     .then(data => {
         if (data.result === 'success') {
             document.getElementById('replyContent').value = '';
-            
+    
             const replyDiv = document.createElement('div');
             replyDiv.className = 'reply';
-            const currentTime = new Date().toISOString();
             replyDiv.innerHTML = `
                 <p>${replyContent}</p>
-                <small class="time-ago" data-timestamp="${currentTime}"></small>
+                <small class="time-ago" data-timestamp="${new Date().toISOString()}"></small>
             `;
-            document.getElementById('replies-container').appendChild(replyDiv);
-            const timeAgoElement = replyDiv.querySelector('.time-ago');
-            timeAgoElement.textContent = timeSince(currentTime);
             
+            document.getElementById('replies-container').appendChild(replyDiv);
+    
+            const timeAgoElements = replyDiv.getElementsByClassName('time-ago');
+            for (let elem of timeAgoElements) {
+                elem.textContent = timeSince(new Date(elem.getAttribute('data-timestamp')));
+            }
         } else {
             alert('Failed to submit reply.');
         }
@@ -71,3 +75,4 @@ document.addEventListener('DOMContentLoaded', (event) => {
         element.textContent = timeSince(timestamp);
     });
 });
+
