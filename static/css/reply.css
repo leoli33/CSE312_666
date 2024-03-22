@@ -13,6 +13,18 @@
 .back-button:hover {
     background-color: #e7c3ca; 
 }
+
+.thread-content{
+    word-wrap: break-word ;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    max-width: 100% ;
+    text-align: left;
+}
+
+
+
+
 .toggle-reply-btn {
     position: fixed;
     bottom: 10px;
