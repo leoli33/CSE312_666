@@ -23,9 +23,11 @@ document.getElementById('replyForm').addEventListener('submit', function(event) 
             const replyDiv = document.createElement('div');
             replyDiv.className = 'reply';
             replyDiv.innerHTML = `
-                <p>${replyContent}</p>
-                <p class="reply-author">Posted by: ${data.author_email}</p> <!-- Include author here -->
-                <small class="time-ago" data-timestamp="${new Date().toISOString()}"></small>
+                <p class="reply-content">${replyContent}</p>
+                <div class="reply-details">
+                    <span class="posted-by">Posted by: ${data.author_email}</span>
+                    <small class="time-ago" data-timestamp="${new Date().toISOString()}">just now</small>
+                </div>
             `;
     
             document.getElementById('replies-container').appendChild(replyDiv);

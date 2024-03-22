@@ -19,13 +19,13 @@
             <h3>Replies</h3>
             {% for reply in replies %}
             <div class="reply">
-                <div class="reply-content">Reply text goes here ...</div>
+                <p class="reply-content">{{ reply.content }}</p>
                 <div class="reply-details">
-                    <span class="posted-by">Posted by: username</span>
-                    <span class="time-ago">time ago</span>
+                    <span class="posted-by">Posted by: {{ reply.author }}</span> 
+                    <span class="time-ago">{{ reply.timestamp }}</span>
                 </div>
             </div>
-        {% endfor %}
+            {% endfor %}
         </div>
         
         <div id="reply-section">
