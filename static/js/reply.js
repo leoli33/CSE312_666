@@ -19,24 +19,23 @@ document.getElementById('replyForm').addEventListener('submit', function(event) 
     .then(data => {
         if (data.result === 'success') {
             document.getElementById('replyContent').value = '';
-    
+            
             const replyDiv = document.createElement('div');
             replyDiv.className = 'reply';
             replyDiv.innerHTML = `
                 <p>${replyContent}</p>
+                <p class="reply-author">Posted by: ${data.author_email}</p> <!-- Include author here -->
                 <small class="time-ago" data-timestamp="${new Date().toISOString()}"></small>
             `;
-            
-            document.getElementById('replies-container').appendChild(replyDiv);
     
-            const timeAgoElements = replyDiv.getElementsByClassName('time-ago');
-            for (let elem of timeAgoElements) {
-                elem.textContent = timeSince(new Date(elem.getAttribute('data-timestamp')));
-            }
+            document.getElementById('replies-container').appendChild(replyDiv);
+            const timeAgoElement = replyDiv.querySelector('.time-ago');
+            timeAgoElement.textContent = timeSince(new Date(timeAgoElement.getAttribute('data-timestamp')));
         } else {
             alert('Failed to submit reply.');
         }
     })
+    
     .catch(error => {
         console.error('Error:', error);
     });
@@ -70,9 +69,20 @@ function timeSince(date) {
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
+    var replySection = document.getElementById('reply-section');
+    var toggleBtn = document.getElementById('toggleReplySectionBtn');
     document.querySelectorAll('.time-ago').forEach(function(element) {
         var timestamp = element.getAttribute('data-timestamp');
         element.textContent = timeSince(timestamp);
+    });
+    toggleBtn.addEventListener('click', function() {
+        if (replySection.style.display === 'none') {
+            replySection.style.display = 'block';
+
+        } else {
+            replySection.style.display = 'none'; 
+
+        }
     });
 });
 

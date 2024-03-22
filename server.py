@@ -200,14 +200,17 @@ def post_detail(post_id):
     post_data = posts_collection.find_one({'_id': ObjectId(post_id)})
     if post_data:
         author_email = post_data.get('author', 'Unknown author')
-        # print("Author email at post detail:", author_email)
         replies_data = replies_collection.find({'threadId': ObjectId(post_id)})
-        replies = list(replies_data)
-        for reply in replies:
+        replies = []
+        for reply in replies_data:
+            # Add author_email or username to reply object
+            reply['author'] = reply.get('author', 'Unknown author')
             reply['timestamp'] = reply['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
+            replies.append(reply)
         return render_template('reply.html', post=post_data, author=author_email, replies=replies)
     else:
         return "Post not found", 404
+
 
 
 @app.route('/submit-reply', methods=['POST'])
@@ -215,16 +218,19 @@ def submit_reply():
     data = request.json
     thread_id = data['threadId']
     content = data['content']
+    author_email = session.get('user_email', 'Unknown author') 
     reply_id = replies_collection.insert_one({
         'threadId': ObjectId(thread_id),
         'content': content,
-        'timestamp': datetime.utcnow()
+        'timestamp': datetime.utcnow(),
+        'author': author_email
     }).inserted_id
 
     if reply_id:
-        return jsonify({'result': 'success', 'reply_id': str(reply_id)})
+        return jsonify({'result': 'success', 'reply_id': str(reply_id), 'author_email': author_email})
     else:
         return jsonify({'result': 'error', 'message': 'Failed to insert reply'}), 500
+
     
 @app.route('/my_posts')
 def my_posts():

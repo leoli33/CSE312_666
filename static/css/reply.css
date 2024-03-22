@@ -13,10 +13,23 @@
 .back-button:hover {
     background-color: #e7c3ca; 
 }
+.toggle-reply-btn {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 1000; 
+    background: none; 
+    border: none; 
+    cursor: pointer;
+}
+.toggle-reply-btn img {
+    width: 40px; 
+    height: auto; 
+}
 .post-author {
     font-style: italic;
     color: #888;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 #reply-section {
     position: fixed;
@@ -35,12 +48,28 @@
 
 .reply {
     display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    margin-top: 10px;
-    padding: 5px;
+    flex-direction: column; 
+    align-items: flex-start; 
+    margin-top: 5px;
+    padding: 2px;
     border: 1px solid #ccc;
     background: #f9f9f9;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
+}
+.reply p {
+    text-align: left;
+}
+
+.reply-content {
+    max-width: 100%; 
+}
+
+.reply-details {
+    display: flex;
+    justify-content: space-between; 
+    width: 100%; 
 }
 
 .time-ago {

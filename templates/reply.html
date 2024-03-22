@@ -5,6 +5,9 @@
 {% block content %}
     <link rel="stylesheet" type="text/css" href="/static/css/reply.css">
     <div class="container">
+        <button id="toggleReplySectionBtn" class="toggle-reply-btn">
+            <img src="/static/icons/post.png" alt="Toggle Replies" />
+        </button>
         <div id="thread-content" data-post-id="{{ post._id }}">
             <h2>{{ post.title }}</h2>
             <p>{{ post.content }}</p>
@@ -14,11 +17,14 @@
         <div id="replies-container">
             <h3>Replies</h3>
             {% for reply in replies %}
-                <div class="reply">
-                    <p>{{ reply.content }}</p>
-                    <small class="time-ago" data-timestamp="{{ reply.timestamp }}"></small>
+            <div class="reply">
+                <div class="reply-content">Reply text goes here ...</div>
+                <div class="reply-details">
+                    <span class="posted-by">Posted by: username</span>
+                    <span class="time-ago">time ago</span>
                 </div>
-            {% endfor %}
+            </div>
+        {% endfor %}
         </div>
         
         <div id="reply-section">
