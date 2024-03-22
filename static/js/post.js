@@ -32,10 +32,11 @@ document.getElementById("newThreadForm").addEventListener("submit", function(eve
             var authorEmail = data.author_email || 'Unknown';
             newPostSummary.className = "post-summary";
             newPostSummary.setAttribute('data-posting-time', new Date().toISOString()); 
+            var contentPreview = content.slice(0, 10);
             newPostSummary.innerHTML = `
                 <div>
                     <h3>${title}</h3>
-                    <p>${content.split('\n')[0]}... - Posted by: ${authorEmail}</p>
+                    <p>${contentPreview}... - Posted by: ${authorEmail}</p>
                 </div>
                 <div class="post-last-reply-time">
                     <small>Last reply: <span class="time-ago">just now</span></small>

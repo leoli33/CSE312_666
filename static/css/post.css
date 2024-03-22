@@ -43,20 +43,10 @@
     border-bottom: 1px solid #ccc;
     background: #ffffff; 
 }
-.post-summary p {
-    white-space: pre-wrap; 
-    overflow-wrap: break-word; 
-    word-break: break-word; 
-    max-height: 4.5em; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    display: -webkit-box; 
-    -webkit-line-clamp: 3; 
-    -webkit-box-orient: vertical; 
-}
 .post-summary:hover {
     background-color: #f9f9f9; 
 }
+
 
 /* Sidebar styles */
 .top-nav {

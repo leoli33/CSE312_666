@@ -19,7 +19,7 @@
             <div class="post-summary" data-posting-time="{{ post.posting_time }}" onclick="location.href='/posts/{{ post._id }}'">
                 <div>
                     <h3>{{ post.title }}</h3>
-                    <p>{{ post.content_preview }} - Posted by: {{ post.author }}</p>
+                    <p>{{ post.content_preview[:10] }} - Posted by: {{ post.author }}</p>
                 </div>
                 {% if post.last_reply_time %}
                 <div class="post-last-reply-time">
