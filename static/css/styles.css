@@ -15,7 +15,7 @@ h2 {
     font-weight: 700;
     line-height: 60px;
     letter-spacing: 0%;
-    text-align: left;
+    text-align: center;
 }
 
 h3 {
@@ -34,7 +34,7 @@ p {
     font-weight: 400;
     line-height: 23px;
     letter-spacing: 0%;
-    text-align: left;
+    text-align: center;
 }
 
 .fp{
@@ -45,101 +45,62 @@ p {
     
 }
 
-.button_login {
-    background-color: rgb(255, 173, 210);
-    border: none;
-    display: inline-block;
-    padding: 8px 18px;
-    text-align: center;
-    color: white;
-    box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.25);
-    margin-top: 5vh;
-    margin-right: 10px;
-}
-
-.button_signup {
-    display: inline-block;
-    padding: 8px 18px;
-    text-align: center;
-    box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.25);
-    margin-top: 5vh;
-    box-sizing: border-box;
-    border: 1px solid rgb(255, 133, 192);
-    background: rgb(255, 255, 255);
-    color: rgb(255, 133, 192);
-}
-
-.box_login {
-    width: 70%;
-    height: 5vh;
-    box-sizing: border-box;
-    border: 1px solid rgb(193, 187, 187);
-    background: rgb(255, 255, 255);
-    margin-bottom: 1 vh;
-}
-
 body {
     margin: 0;
     padding: 0;
     font-family: 'Outfit', sans-serif;
-    background-color: rgb(255, 241, 240);
 }
 
 .container {
-    display: flex;
-    flex-wrap: wrap;
+    width: 70vw;
     place-items: center;
-    justify-content: center;
     position: relative;
     overflow: hidden;
-    background-color: white;
-}
-
-.login-container {
-    width: 38vw;
-    height: 80vh;
-    margin-top: auto;
-    margin-left: 5vw;
-    margin-right: 2vw;
-    margin-bottom: auto;
-    flex: 1;
-    background-color: white;
-}
-
-.image-menu-container {
-    width: 50%;
-    height: 100vh;
-    background: rgb(255, 241, 240);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-}
-
-.image-menu-container img {
-    max-width: 100%;
-    height: auto;
-    padding: 0;
-    margin: 0;
-}
-
-@media screen and (max-width: 768px) {
-    .container {
-        flex-direction: column; 
-        width: 100%;
-    }
-    .image-menu-container {
-        order: 1; 
-    }
-    .login-container {
-        order: 2; 
-    }
-}
-
-.body-container {
-    background-color: white;
-    width: 70vw;
-    height:auto;
-    padding: 2vw;
     overflow-y: auto;
+    margin: auto;
+}
+.nav {
+    background-color: rgb(255, 180, 214); 
+}
+.tab {
+    margin: auto;
+    background-color: rgb(255, 180, 214); 
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-end; 
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+    background-color: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-family: 'Outfit', sans-serif;
+}
+  
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+  
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+.tab button a{
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: medium;
+}
+
+.menu_icon {
+    width: 40px;
+    height: 40px; 
+    position: fixed;
+    cursor: pointer; 
+    top: 3px;
 }

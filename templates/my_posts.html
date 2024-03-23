@@ -1,38 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/styles_post.css">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/images/design.png">
-</head>
-<body>
-    <div class="top-nav">
-        <a href="/home">Home</a> 
-        <a href="/post">Post</a>
-        <a href="/logout">Logout</a> 
-        <!-- You can add more links here if needed -->
-    </div>
+{% extends 'base.html' %}
+
+{% block title %}Home - My Posts{% endblock %}
+
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="/static/css/post.css">
     <div class="container">
         <h1>My Posts</h1>
-        <img src="/static/images/chat.png" alt="Chat" class="icon chat-icon" id="chatIcon" onclick="toggleChatSidebar()">
-        <img src="/static/images/guest.png" alt="User" class="icon user-icon" id="ProfileIcon" onclick="toggleProfileSidebar()">
-        <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeSidebar()">&times;</a>
-            <a href="profile">Profile</a>
-            <a href="message">Message</a>
-            <a href="logout">Logout</a>
-        </div>
-        <div id="myChatSidebar" class="chat-sidebar">
-            <a href="javascript:void(0)" class="closebtn" onclick="closeChatSidebar()">&times;</a>
-        </div>
         <div id="posts-container" class="post-container-top-space">
             {% for post in posts %}
             <div class="post-summary" data-posting-time="{{ post.posting_time }}" onclick="location.href='/posts/{{ post._id }}'">
                 <div>
                     <h3>{{ post.title }}</h3>
-                    <p>{{ post.content_preview }} - Posted by: {{ post.author }}</p>
+                    <p>{{ post.content_preview[:10] }} - Posted by: {{ post.author }}</p>
                 </div>
                 {% if post.last_reply_time %}
                 <div class="post-last-reply-time">
@@ -48,7 +27,6 @@
             <p>You have not posted anything yet.</p>
             {% endfor %}
         </div>
+        <script src="/static/js/post.js"></script>
     </div>
-    <script src="/static/js/functions_post.js"></script>
-</body>
-</html>
+{% endblock %}

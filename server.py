@@ -1,5 +1,5 @@
 
-from flask import Flask, request, render_template, send_from_directory, jsonify, redirect, url_for, flash, make_response, session, session
+from flask import Flask, request, render_template, send_from_directory, jsonify, redirect, url_for, flash, make_response, session
 
 from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
@@ -22,16 +22,31 @@ app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app)
 
+def check_login():
+    # Check if the auth token is in the session
+    if 'auth_token' not in request.cookies:
+        return redirect(url_for('login_page'))
+    else:
+        # Check if the auth token is valid (e.g., validate against database or other storage)
+        auth_token = request.cookies.get('auth_token')
+        if not validate_auth_token(auth_token):  # Implement this function to validate the auth token
+            return redirect(url_for('login_page'))
+
+def validate_auth_token(auth_token):
+    # Return True if the token is valid, False otherwise
+    return True  # Placeholder, replace with actual validation logic
+
+@app.before_request
+def before_request():
+    # Call the function to check if the user is logged in before each request
+    check_login()
+    
 @app.after_request
 def security(response):
    response.headers['X-Content-Type-Options'] = 'nosniff'
    return response
 
 @app.route('/')
-def index_html():
-   return render_template('index.html')
-
-@app.route('/home')
 def home():
 
     auth_cook = request.cookies.get('auth_token')
@@ -41,13 +56,13 @@ def home():
 
             if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
                 user_email = session.get("{{user_email}}", None)
-                return render_template('home.html', user_email=doc["email"])
+                return render_template('index.html', user_email=doc["email"])
     
-    return render_template('home.html', user_email='Guest')
+    return render_template('index.html', user_email='Guest')
 
 @app.route('/signup_page')
 def signup_page():
-     return render_template('index_signup.html')
+     return render_template('register.html')
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -61,17 +76,20 @@ def signup():
 
         if cred_collection.find_one({'email': email}): #check email exists
           
-            return render_template('index_signup.html')
+            return render_template('register.html')
         else:
 
             if password != confirm_pass: #password does not match
-                return render_template('index_signup.html')
+                return render_template('register.html')
             
             else: #success
                 hashed_pass = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
                 cred_collection.insert_one({"email":email,"password":hashed_pass})
-                return redirect(url_for('index_html'))
+                return redirect(url_for('login_page'))
         
+@app.route('/login_page')
+def login_page():
+    return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -112,7 +130,7 @@ def login():
                     response.set_cookie('auth_token', auth_tok, max_age = 3600, httponly = True)
                     return response
             
-        return redirect(url_for('index_html')) #login failed
+        return redirect(url_for('login_page')) #login failed
 
 @app.route('/logout',methods = ['POST','GET'])
 def logout():
@@ -125,17 +143,17 @@ def logout():
             if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
 
                 cred_collection.update_one({"email":doc["email"] ,"password":doc["password"],"auth_token":doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], "auth_token": ""}})
-                response = make_response(redirect(url_for('index')))
+                response = make_response(redirect(url_for('home')))
                 response.set_cookie('auth_token', "", expires = 0, httponly = True)
                 return response
 
 ##################发帖子相关 function##################
-@app.route('/post')
+@app.route('/explore')
 def posts_list_html():
     user_email = session.get('user_email', None) 
     if not user_email:
         flash('Please log in to see your posts.') 
-        return redirect(url_for('login'))
+        return redirect(url_for('login_page'))
     
     all_posts = list(posts_collection.find())
     for post in all_posts:
@@ -182,14 +200,17 @@ def post_detail(post_id):
     post_data = posts_collection.find_one({'_id': ObjectId(post_id)})
     if post_data:
         author_email = post_data.get('author', 'Unknown author')
-        # print("Author email at post detail:", author_email)
         replies_data = replies_collection.find({'threadId': ObjectId(post_id)})
-        replies = list(replies_data)
-        for reply in replies:
+        replies = []
+        for reply in replies_data:
+            # Add author_email or username to reply object
+            reply['author'] = reply.get('author', 'Unknown author')
             reply['timestamp'] = reply['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
-        return render_template('post_detail.html', post=post_data, author=author_email, replies=replies)
+            replies.append(reply)
+        return render_template('reply.html', post=post_data, author=author_email, replies=replies)
     else:
         return "Post not found", 404
+
 
 
 @app.route('/submit-reply', methods=['POST'])
@@ -197,23 +218,26 @@ def submit_reply():
     data = request.json
     thread_id = data['threadId']
     content = data['content']
+    author_email = session.get('user_email', 'Unknown author') 
     reply_id = replies_collection.insert_one({
         'threadId': ObjectId(thread_id),
         'content': content,
-        'timestamp': datetime.utcnow()
+        'timestamp': datetime.utcnow(),
+        'author': author_email
     }).inserted_id
 
     if reply_id:
-        return jsonify({'result': 'success', 'reply_id': str(reply_id)})
+        return jsonify({'result': 'success', 'reply_id': str(reply_id), 'author_email': author_email})
     else:
         return jsonify({'result': 'error', 'message': 'Failed to insert reply'}), 500
+
     
 @app.route('/my_posts')
 def my_posts():
     user_email = session.get('user_email', None) 
     if not user_email:
         flash('Please log in to see your posts.') 
-        return redirect(url_for('login'))
+        return redirect(url_for('login_page'))
     
     user_posts = list(posts_collection.find({'author': user_email}))
 

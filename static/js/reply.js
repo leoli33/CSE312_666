@@ -2,11 +2,13 @@
 document.getElementById('replyForm').addEventListener('submit', function(event) {
     event.preventDefault();
     var replyContent = document.getElementById('replyContent').value;
+    var postContainer = document.getElementById('thread-content');
+    var postId = postContainer.dataset.postId; 
 
     fetch('/submit-reply', {
         method: 'POST',
         body: JSON.stringify({ 
-            threadId: '{{ post._id }}', 
+            threadId: postId, 
             content: replyContent 
         }),
         headers: {
@@ -20,19 +22,22 @@ document.getElementById('replyForm').addEventListener('submit', function(event) 
             
             const replyDiv = document.createElement('div');
             replyDiv.className = 'reply';
-            const currentTime = new Date().toISOString();
             replyDiv.innerHTML = `
-                <p>${replyContent}</p>
-                <small class="time-ago" data-timestamp="${currentTime}"></small>
+                <p class="reply-content">${replyContent}</p>
+                <div class="reply-details">
+                    <span class="posted-by">Posted by: ${data.author_email}</span>
+                    <small class="time-ago" data-timestamp="${new Date().toISOString()}">just now</small>
+                </div>
             `;
+    
             document.getElementById('replies-container').appendChild(replyDiv);
             const timeAgoElement = replyDiv.querySelector('.time-ago');
-            timeAgoElement.textContent = timeSince(currentTime);
-            
+            timeAgoElement.textContent = timeSince(new Date(timeAgoElement.getAttribute('data-timestamp')));
         } else {
             alert('Failed to submit reply.');
         }
     })
+    
     .catch(error => {
         console.error('Error:', error);
     });
@@ -66,8 +71,20 @@ function timeSince(date) {
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
+    var replySection = document.getElementById('reply-section');
+    var toggleBtn = document.getElementById('toggleReplySectionBtn');
     document.querySelectorAll('.time-ago').forEach(function(element) {
         var timestamp = element.getAttribute('data-timestamp');
         element.textContent = timeSince(timestamp);
     });
+    toggleBtn.addEventListener('click', function() {
+        if (replySection.style.display === 'none') {
+            replySection.style.display = 'block';
+
+        } else {
+            replySection.style.display = 'none'; 
+
+        }
+    });
 });
+

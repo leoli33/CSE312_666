@@ -1,41 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/styles.css">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/icons/logo.png">
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
     <div class="container">
-        <div class="login-container">
-            <h1>CUPID</h1>
-            <h2>Looking for a Date?</h2>
-            <h3>Welcome back! Please login to your account.</h3>
-
-            <form method="post" action = "/login">
-
-                <input class="box_login" type="text" name = "email" placeholder="Email Address"><br>
-                <input class="box_login" type="password" name="password" placeholder="Password"><br>
-
-                <br>
-                <input type="checkbox" id="rm" name="rm" />
-                <label for="rm">Remember Me</label>
-
-                <a class="fp" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley" >Forget Password?</a>
-
-                <br>
-                <input class="button_login" type="submit" value="Login">
-                
-                <a href="/signup_page" class="button_signup">Sign Up</a>
-            </form>
-            
-        </div>
-
-        <div class="image-menu-container">
-            <img src="/static/icons/logo.png" alt="image"> 
-        </div>
+        <h2>Welcome back, {{ user_email }}!</h2>
+        <p>Find someone interesting here</p>
     </div>
-</body>
-</html>
+{% endblock %}
