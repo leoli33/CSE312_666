@@ -56,9 +56,9 @@ def home():
 
             if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
                 user_email = session.get("{{user_email}}", None)
-                return render_template('home.html', user_email=doc["email"])
+                return render_template('index.html', user_email=doc["email"])
     
-    return render_template('home.html', user_email='Guest')
+    return render_template('index.html', user_email='Guest')
 
 @app.route('/signup_page')
 def signup_page():
