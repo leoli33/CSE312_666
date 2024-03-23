@@ -7,8 +7,8 @@ function checkLoginAndRedirect(userEmail) {
 }
 
 function sidebar_open() {
-    document.getElementById("main").style.marginLeft = "25%";
-    document.getElementById("sidebar").style.width = "25%";
+    document.getElementById("main").style.marginLeft = "150px";
+    document.getElementById("sidebar").style.width = "150px";
     document.getElementById("sidebar").style.display = "block";
     document.getElementById("openNav").style.display = 'none';
 }
