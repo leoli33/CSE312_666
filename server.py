@@ -9,6 +9,7 @@ import pymongo
 import bcrypt
 import string
 import random
+from markupsafe import escape
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["CSE312_666"]
@@ -27,18 +28,18 @@ def check_login():
     if 'auth_token' not in request.cookies:
         return redirect(url_for('login_page'))
     else:
-        # Check if the auth token is valid (e.g., validate against database or other storage)
-        auth_token = request.cookies.get('auth_token')
-        if not validate_auth_token(auth_token):  # Implement this function to validate the auth token
+        auth_cook = request.cookies.get('auth_token')
+        if not validate_auth_token(auth_cook):
             return redirect(url_for('login_page'))
 
-def validate_auth_token(auth_token):
-    # Return True if the token is valid, False otherwise
-    return True  # Placeholder, replace with actual validation logic
+def validate_auth_token(auth_cook):
+    for doc in cred_collection.find({},{'_id' : False}):
+        if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
+            return True  # Placeholder, replace with actual validation logic
+    return False
 
 @app.before_request
 def before_request():
-    # Call the function to check if the user is logged in before each request
     check_login()
     
 @app.after_request
@@ -134,6 +135,7 @@ def login():
 
 @app.route('/logout',methods = ['POST','GET'])
 def logout():
+    session.pop('user_email', None)
     if request.method == "GET":
 
         auth_cook = request.cookies.get('auth_token')
@@ -182,7 +184,7 @@ def submit_post():
     content = data['content']
     author_email = session.get('user_email')
     # print("Author email at post submission:", author_email) 
-    post_id = posts_collection.insert_one({'title': title, 'content': content, 'author': author_email}).inserted_id
+    post_id = posts_collection.insert_one({'title': escape(title), 'content': escape(content), 'author': author_email}).inserted_id
     return jsonify({'result': 'success', 'post_id': str(post_id), 'author_email': author_email})
 
 @app.route('/clear-posts', methods=['POST'])
@@ -221,7 +223,7 @@ def submit_reply():
     author_email = session.get('user_email', 'Unknown author') 
     reply_id = replies_collection.insert_one({
         'threadId': ObjectId(thread_id),
-        'content': content,
+        'content': escape(content),
         'timestamp': datetime.utcnow(),
         'author': author_email
     }).inserted_id
@@ -266,28 +268,23 @@ def my_posts():
 
 @app.route('/message', methods=['GET', 'POST', 'PUT'])
 def message():
-    auth_cook = request.cookies.get('auth_token')
-    for doc in cred_collection.find({},{'_id' : False}):
-        if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
-            email = doc["email"].split("@")
-            username = email[0]
-            #print(username)
-            #print(email)
-            username = session.get('username', username) #default username = guest
-            load_messages = list(chat_collection.find()) #load message from data base into list
-            return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
-        
-    return "user not associated",404
+    if 'auth_token' in request.cookies:
+        auth_cook = request.cookies.get('auth_token')
+        for doc in cred_collection.find({},{'_id' : False}):
+            if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
+                email = doc["email"].split("@")
+                username = email[0]
+                #print(username)
+                #print(email)
+                username = session.get('username', username) #default username = guest
+                load_messages = list(chat_collection.find()) #load message from data base into list
+                return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
+    return redirect(url_for('login_page'))
     
 @socketio.on("chat_message")
 def user_input(message):
     sender = message["sender"]
-    messages = message["message"]
-
-    messages = messages.replace("&", "&amp")
-    messages = messages.replace("<", "&lt")
-    messages = messages.replace(">", "&gt")
-
+    messages = escape(message["message"])
     chat_collection.insert_one({"username": sender, "message": messages})
     emit("load_chat", {"username": sender, "message": messages},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
