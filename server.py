@@ -230,9 +230,14 @@ def submit_reply():
     thread_id = data['threadId']
     content = data['content']
     author_email = session.get('user_email', 'Unknown author') 
+
+    content = content.replace("&amp;","&")
+    content = content.replace("&lt;","<")
+    content = content.replace("&gt;",">")
+
     reply_id = replies_collection.insert_one({
         'threadId': ObjectId(thread_id),
-        'content': (content),
+        'content': str(content),
         'timestamp': datetime.utcnow(),
         'author': author_email
     }).inserted_id
@@ -272,7 +277,7 @@ def my_posts():
     return render_template('my_posts.html', posts=user_posts)
 
 
-##################发帖子相关 function##################
+##################posting unction##################
 
 @app.route('/message', methods=['GET', 'POST', 'PUT'])
 def message():
