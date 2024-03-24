@@ -3,6 +3,11 @@ document.getElementById('replyForm').addEventListener('submit', function(event) 
     event.preventDefault();
     var replyContent = document.getElementById('replyContent').value;
     var postContainer = document.getElementById('thread-content');
+
+    replyContent = replyContent.replace(/&/g,"&amp;");
+    replyContent = replyContent.replace(/</g,"&lt;");
+    replyContent = replyContent.replace(/>/g,"&gt;");
+
     var postId = postContainer.dataset.postId; 
 
     fetch('/submit-reply', {
