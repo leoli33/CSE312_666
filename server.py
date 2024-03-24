@@ -183,8 +183,17 @@ def submit_post():
     title = data['title']
     content = data['content']
     author_email = session.get('user_email')
+
+    title = title.replace("&amp;","&")
+    title = title.replace("&lt;","<")
+    title = title.replace("&gt;",">")
+
+    content = content.replace("&amp;","&")
+    content = content.replace("&lt;","<")
+    content = content.replace("&gt;",">")
+
     # print("Author email at post submission:", author_email) 
-    post_id = posts_collection.insert_one({'title': escape(title), 'content': escape(content), 'author': author_email}).inserted_id
+    post_id = posts_collection.insert_one({'title': str(title), 'content': str(content), 'author': author_email}).inserted_id
     return jsonify({'result': 'success', 'post_id': str(post_id), 'author_email': author_email})
 
 @app.route('/clear-posts', methods=['POST'])
@@ -223,7 +232,7 @@ def submit_reply():
     author_email = session.get('user_email', 'Unknown author') 
     reply_id = replies_collection.insert_one({
         'threadId': ObjectId(thread_id),
-        'content': escape(content),
+        'content': (content),
         'timestamp': datetime.utcnow(),
         'author': author_email
     }).inserted_id
@@ -263,7 +272,6 @@ def my_posts():
     return render_template('my_posts.html', posts=user_posts)
 
 
-
 ##################发帖子相关 function##################
 
 @app.route('/message', methods=['GET', 'POST', 'PUT'])
@@ -284,7 +292,7 @@ def message():
 @socketio.on("chat_message")
 def user_input(message):
     sender = message["sender"]
-    messages = escape(message["message"])
+    messages = (message["message"])
     chat_collection.insert_one({"username": sender, "message": messages})
     emit("load_chat", {"username": sender, "message": messages},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
