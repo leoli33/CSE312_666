@@ -18,6 +18,14 @@ document.getElementById("newThreadForm").addEventListener("submit", function(eve
     var title = document.getElementById("newThreadTitle").value;
     var content = document.getElementById("newThreadContent").value;
 
+    content = content.replace(/&/g,"&amp;");
+    content = content.replace(/</g,"&lt;");
+    content = content.replace(/>/g,"&gt;");
+
+    title = title.replace(/&/g,"&amp;");
+    title = title.replace(/</g,"&lt;");
+    title = title.replace(/>/g,"&gt;");
+
     fetch('/submit-post', {
         method: 'POST',
         body: JSON.stringify({ title: title, content: content }),
