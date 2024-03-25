@@ -1,15 +1,10 @@
 
-from flask import Flask, request, render_template, send_from_directory, jsonify, redirect, url_for, flash, make_response, session
-
+from flask import Flask, request, render_template, send_from_directory, jsonify, redirect, url_for, flash, make_response
 from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
-import pymongo
-import bcrypt
-import string
-import random
-from markupsafe import escape
+import pymongo, bcrypt, string, random
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["CSE312_666"]
@@ -18,29 +13,18 @@ posts_collection = db["Posts"]
 replies_collection = db['Replies']
 cred_collection = db["cred"]
 
-
 app = Flask(__name__)
-app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app)
 
-def check_login():
-    # Check if the auth token is in the session
-    if 'auth_token' not in request.cookies:
-        return redirect(url_for('login_page'))
-    else:
-        auth_cook = request.cookies.get('auth_token')
-        if not validate_auth_token(auth_cook):
-            return redirect(url_for('login_page'))
+def get_username():
+    auth_cook = request.cookies.get('auth_token')
 
-def validate_auth_token(auth_cook):
-    for doc in cred_collection.find({},{'_id' : False}):
-        if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
-            return True  # Placeholder, replace with actual validation logic
-    return False
+    if auth_cook != None and auth_cook != "":
+        for doc in cred_collection.find({},{'_id' : False}):
 
-@app.before_request
-def before_request():
-    check_login()
+            if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
+                return doc["email"]
+    return 'Guest'
     
 @app.after_request
 def security(response):
@@ -49,17 +33,8 @@ def security(response):
 
 @app.route('/')
 def home():
-
-    auth_cook = request.cookies.get('auth_token')
-
-    if auth_cook != None and auth_cook != "":
-        for doc in cred_collection.find({},{'_id' : False}):
-
-            if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
-                user_email = session.get("{{user_email}}", None)
-                return render_template('index.html', user_email=doc["email"])
-    
-    return render_template('index.html', user_email='Guest')
+    user_email = get_username()
+    return render_template('index.html', user_email=user_email)
 
 @app.route('/signup_page')
 def signup_page():
@@ -75,7 +50,7 @@ def signup():
         confirm_pass = str(request.form['password_confirm'])
 
 
-        if cred_collection.find_one({'email': email}): #check email exists
+        if cred_collection.find_one({'email': email}) or email == 'Guest': #check email exists
           
             return render_template('register.html')
         else:
@@ -98,44 +73,25 @@ def login():
 
         email = str(request.form['email'])
         password = str(request.form['password'])
-        session['user_email'] = 'user@example.com'
-        # print("default email: ", session['user_email'])
 
         for doc in cred_collection.find({},{'_id' : False}):
 
             if email == doc["email"] and bcrypt.checkpw(password.encode(),doc["password"]): #can log in
 
-                print(request.cookies.get('auth_token') )
-
-                #auth_cook = request.cookies.get('auth_token')
-                session['user_email'] = doc["email"]
-                # print("actual email: ", session['user_email'])
-
                 N = 20
                 auth_tok = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=N))
                 hashed_token = bcrypt.hashpw(auth_tok.encode(), bcrypt.gensalt())
 
-                if "auth_token" in doc.keys(): #already has token in db
+                cred_collection.update_one({"email":doc["email"], "password":doc["password"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], "auth_token": hashed_token}})
 
-                    cred_collection.update_one({"email":doc["email"] ,"password":doc["password"],"auth_token":doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], "auth_token": hashed_token}})
-
-                    response = make_response(redirect(url_for('home')))
-                    response.set_cookie('auth_token', auth_tok, max_age = 3600, httponly = True)
-                    return response
-                    
-                
-                else: #never had token in db
-                    cred_collection.update_one({"email":doc["email"] ,"password":doc["password"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], "auth_token": hashed_token}})
-
-                    response = make_response(redirect(url_for('home')))
-                    response.set_cookie('auth_token', auth_tok, max_age = 3600, httponly = True)
-                    return response
+                response = make_response(redirect(url_for('home')))
+                response.set_cookie('auth_token', auth_tok, max_age = 3600, httponly = True)
+                return response
             
         return redirect(url_for('login_page')) #login failed
 
 @app.route('/logout',methods = ['POST','GET'])
 def logout():
-    session.pop('user_email', None)
     if request.method == "GET":
 
         auth_cook = request.cookies.get('auth_token')
@@ -152,9 +108,8 @@ def logout():
 ##################发帖子相关 function##################
 @app.route('/explore')
 def posts_list_html():
-    user_email = session.get('user_email', None) 
-    if not user_email:
-        flash('Please log in to see your posts.') 
+    user_email = get_username()
+    if user_email == 'Guest':
         return redirect(url_for('login_page'))
     
     all_posts = list(posts_collection.find())
@@ -182,7 +137,7 @@ def submit_post():
     data = request.json
     title = data['title']
     content = data['content']
-    author_email = session.get('user_email')
+    author_email = get_username()
 
     title = title.replace("&amp;","&")
     title = title.replace("&lt;","<")
@@ -229,7 +184,7 @@ def submit_reply():
     data = request.json
     thread_id = data['threadId']
     content = data['content']
-    author_email = session.get('user_email', 'Unknown author') 
+    author_email = get_username()
 
     content = content.replace("&amp;","&")
     content = content.replace("&lt;","<")
@@ -250,9 +205,8 @@ def submit_reply():
     
 @app.route('/my_posts')
 def my_posts():
-    user_email = session.get('user_email', None) 
-    if not user_email:
-        flash('Please log in to see your posts.') 
+    user_email = get_username()
+    if user_email == 'Guest':
         return redirect(url_for('login_page'))
     
     user_posts = list(posts_collection.find({'author': user_email}))
@@ -281,18 +235,12 @@ def my_posts():
 
 @app.route('/message', methods=['GET', 'POST', 'PUT'])
 def message():
-    if 'auth_token' in request.cookies:
-        auth_cook = request.cookies.get('auth_token')
-        for doc in cred_collection.find({},{'_id' : False}):
-            if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
-                email = doc["email"].split("@")
-                username = email[0]
-                #print(username)
-                #print(email)
-                username = session.get('username', username) #default username = guest
-                load_messages = list(chat_collection.find()) #load message from data base into list
-                return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
-    return redirect(url_for('login_page'))
+    username = get_username()
+    if username == 'Guest':
+        return redirect(url_for('login_page'))
+    
+    load_messages = list(chat_collection.find()) #load message from data base into list
+    return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
     
 @socketio.on("chat_message")
 def user_input(message):
