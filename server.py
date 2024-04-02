@@ -14,7 +14,7 @@ replies_collection = db['Replies']
 cred_collection = db["cred"]
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, transports=['websocket'])
 
 def get_username():
     auth_cook = request.cookies.get('auth_token')
