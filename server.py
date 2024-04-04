@@ -87,7 +87,7 @@ def profile():
                 cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'photo_path':path}})
 
         print(path)
-        return render_template('profile.html',user_email=user_email)
+        return redirect(url_for('profile'))
 
 @app.route('/signup_page')
 def signup_page():
