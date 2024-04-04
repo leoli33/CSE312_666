@@ -43,10 +43,20 @@ def home():
 @app.route('/profile', methods=['POST','GET'])
 def profile():
     user_email = get_username()
+    get_photo_path = "Nothing"
     if request.method == "GET":
-        
-        return render_template('profile.html',user_email=user_email)
+        for doc in cred_collection.find():
+            if doc["email"] == user_email:
+                if 'photo_path' in doc:
+                    get_photo_path = doc['photo_path']
+                else:
+                    get_photo_path = "./static/profile_images/default.png"
+            else:
+                get_photo_path = "./static/profile_images/default.png"
+
+        return render_template('profile.html',user_email=user_email, get_photo_path=get_photo_path)
     elif request.method == "POST":
+        print("POST request received.")
         photo = request.files['uploaded_pic']
         id = 0
         for doc in cred_collection.find():
@@ -55,7 +65,7 @@ def profile():
 
         photo_header = photo.read(64)
         photo.seek(0)
-
+    
         pnghex = "89504E470D0A1A0A"
         png =bytes.fromhex(pnghex)
 
@@ -75,11 +85,9 @@ def profile():
         for doc in cred_collection.find():
             if doc["email"] == user_email:
                 cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'photo_path':path}})
-                
 
+        print(path)
         return render_template('profile.html',user_email=user_email)
-
-
 
 @app.route('/signup_page')
 def signup_page():
