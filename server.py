@@ -51,43 +51,52 @@ def profile():
                     get_photo_path = doc['photo_path']
                 else:
                     get_photo_path = "./static/profile_images/default.png"
+                if 'new_username' in doc:
+                    user_email = doc['new_username']
             else:
                 get_photo_path = "./static/profile_images/default.png"
 
         return render_template('profile.html',user_email=user_email, get_photo_path=get_photo_path)
     elif request.method == "POST":
-        print("POST request received.")
-        photo = request.files['uploaded_pic']
-        id = 0
-        for doc in cred_collection.find():
-            if doc["email"] == user_email:
-                id = doc['id']
+        if 'uploaded_pic' in request.files:
+            photo = request.files['uploaded_pic']
+            id = 0
+            for doc in cred_collection.find():
+                if doc["email"] == user_email:
+                    id = doc['id']
 
-        photo_header = photo.read(64)
-        photo.seek(0)
-    
-        pnghex = "89504E470D0A1A0A"
-        png =bytes.fromhex(pnghex)
-
-        im_type = ''
+            photo_header = photo.read(64)
+            photo.seek(0)
         
-        if photo_header.startswith(b'\xFF\xD8'): #jpeg&jpg
-            im_type = '.jpeg'
+            pnghex = "89504E470D0A1A0A"
+            png =bytes.fromhex(pnghex)
 
-        elif photo_header.startswith(png): #png
-            im_type = '.png'
+            im_type = ''
+            
+            if photo_header.startswith(b'\xFF\xD8'): #jpeg&jpg
+                im_type = '.jpeg'
 
-        filename = 'profile_pic_'+str(id)+im_type
-        path = os.path.join('./static/profile_images',filename)
+            elif photo_header.startswith(png): #png
+                im_type = '.png'
 
-        photo.save(path)
+            filename = 'profile_pic_'+str(id)+im_type
+            path = os.path.join('./static/profile_images',filename)
 
-        for doc in cred_collection.find():
-            if doc["email"] == user_email:
-                cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'photo_path':path}})
+            photo.save(path)
 
-        print(path)
-        return redirect(url_for('profile'))
+            for doc in cred_collection.find():
+                if doc["email"] == user_email:
+                    cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'photo_path':path}})
+
+            print(path)
+            return redirect(url_for('profile'))
+        elif 'username' in request.form:
+            new_name = request.form.get('username')
+            for doc in cred_collection.find():
+                if doc["email"] == user_email:
+                    cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'new_username':new_name}})
+                    
+            return redirect(url_for('profile'))
 
 @app.route('/signup_page')
 def signup_page():
