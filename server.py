@@ -20,7 +20,7 @@ socketio = SocketIO(app, transports=['websocket'])
 # cred_collection.delete_many({})
 
 
-def get_username():
+def get_user_email():
     auth_cook = request.cookies.get('auth_token')
 
     if auth_cook != None and auth_cook != "":
@@ -37,64 +37,54 @@ def security(response):
 
 @app.route('/')
 def home():
-    user_email = get_username()
+    user_email = get_user_email()
     return render_template('index.html', user_email=user_email)
 
 @app.route('/profile', methods=['POST','GET'])
 def profile():
-    user_email = get_username()
+    user_email = get_user_email()
+    if user_email == 'Guest':
+        return redirect(url_for('login_page'))
+    
+    doc = cred_collection.find_one({'email': user_email})
+    
     get_photo_path = "Nothing"
     if request.method == "GET":
-        for doc in cred_collection.find():
-            if doc["email"] == user_email:
-                if 'photo_path' in doc:
-                    get_photo_path = doc['photo_path']
-                else:
-                    get_photo_path = "./static/profile_images/default.png"
-                if 'new_username' in doc:
-                    user_email = doc['new_username']
-            else:
-                get_photo_path = "./static/profile_images/default.png"
+        if 'photo_path' in doc:
+            get_photo_path = doc['photo_path']
+        else:
+            get_photo_path = "./static/profile_images/default.png"
+            
+        if 'new_username' in doc:
+            user_email = doc['new_username']
 
         return render_template('profile.html',user_email=user_email, get_photo_path=get_photo_path)
+    
     elif request.method == "POST":
         if 'uploaded_pic' in request.files:
             photo = request.files['uploaded_pic']
-            id = 0
-            for doc in cred_collection.find():
-                if doc["email"] == user_email:
-                    id = doc['id']
-
             photo_header = photo.read(64)
             photo.seek(0)
-        
             pnghex = "89504E470D0A1A0A"
             png =bytes.fromhex(pnghex)
 
             im_type = ''
-            
             if photo_header.startswith(b'\xFF\xD8'): #jpeg&jpg
                 im_type = '.jpeg'
-
             elif photo_header.startswith(png): #png
                 im_type = '.png'
 
-            filename = 'profile_pic_'+str(id)+im_type
+            filename = 'profile_pic_'+str(doc['id'])+im_type
             path = os.path.join('./static/profile_images',filename)
-
             photo.save(path)
 
-            for doc in cred_collection.find():
-                if doc["email"] == user_email:
-                    cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'photo_path':path}})
+            cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'photo_path':path}})
 
-            print(path)
             return redirect(url_for('profile'))
+        
         elif 'username' in request.form:
             new_name = request.form.get('username')
-            for doc in cred_collection.find():
-                if doc["email"] == user_email:
-                    cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'new_username':new_name}})
+            cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'new_username':new_name}})
                     
             return redirect(url_for('profile'))
 
@@ -177,7 +167,7 @@ def logout():
 ##################发帖子相关 function##################
 @app.route('/explore')
 def posts_list_html():
-    user_email = get_username()
+    user_email = get_user_email()
     if user_email == 'Guest':
         return redirect(url_for('login_page'))
     
@@ -206,7 +196,7 @@ def submit_post():
     data = request.json
     title = data['title']
     content = data['content']
-    author_email = get_username()
+    author_email = get_user_email()
 
     title = title.replace("&amp;","&")
     title = title.replace("&lt;","<")
@@ -253,7 +243,7 @@ def submit_reply():
     data = request.json
     thread_id = data['threadId']
     content = data['content']
-    author_email = get_username()
+    author_email = get_user_email()
 
     content = content.replace("&amp;","&")
     content = content.replace("&lt;","<")
@@ -274,7 +264,7 @@ def submit_reply():
     
 @app.route('/my_posts')
 def my_posts():
-    user_email = get_username()
+    user_email = get_user_email()
     if user_email == 'Guest':
         return redirect(url_for('login_page'))
     
@@ -304,10 +294,14 @@ def my_posts():
 
 @app.route('/message', methods=['GET', 'POST', 'PUT'])
 def message():
-    username = get_username()
+    username = get_user_email()
     if username == 'Guest':
         return redirect(url_for('login_page'))
     
+    doc = cred_collection.find_one({'email': username})
+    if 'new_username' in doc:
+            username = doc['new_username']
+            
     load_messages = list(chat_collection.find()) #load message from data base into list
     return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
     
