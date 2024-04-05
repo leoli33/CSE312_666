@@ -58,43 +58,37 @@ body {
     overflow: hidden;
     overflow-y: auto;
     margin: auto;
+    margin-top: 48px;
 }
-.nav {
-    background-color: rgb(255, 180, 214); 
-}
+
 .tab {
     margin: auto;
     background-color: rgb(255, 180, 214); 
     overflow: hidden;
-    display: flex;
-    justify-content: flex-end; 
+    position: fixed; /* Set the navbar to fixed position */
+    top: 0; /* Position the navbar at the top of the page */
+    width: 100%; /* Full width */
 }
 
-/* Style the buttons that are used to open the tab content */
-.tab button {
-    background-color: inherit;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    padding: 14px 16px;
-    transition: 0.3s;
-    font-family: 'Outfit', sans-serif;
-}
-  
-/* Change background color of buttons on hover */
-.tab button:hover {
-    background-color: #ddd;
-}
-  
-/* Create an active/current tablink class */
-.tab button.active {
-    background-color: #ccc;
-}
-
-.tab button a{
+.tab a {
+    float: right;
     text-decoration: none;
     color: rgba(0, 0, 0, 0.65);
     font-size: medium;
+    text-align: center;
+    padding: 14px 16px;
+    transition: 0.3s;
+    
+}
+  
+/* Change the color of links on hover */
+.tab a:hover {
+    background-color: #ddd;
+}
+  
+/* Add a color to the active/current link */
+.tab a.active {
+    background-color: #ccc;
 }
 
 .menu_icon {
