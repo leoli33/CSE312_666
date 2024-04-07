@@ -1,4 +1,4 @@
-const socket = io({transports:['websocket']});
+const socket = io({});
 const chatMessages = document.getElementById("chat-messages");
 const clearButton = document.getElementById("clear-button");
 const chatForm = document.getElementById('chat-form');

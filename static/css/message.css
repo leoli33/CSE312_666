@@ -12,6 +12,7 @@ body {
     justify-content: flex-end; 
     padding: 20px;
     box-sizing: border-box;
+    padding-top: 60px;
 }
 
 .chat-messages {
@@ -51,12 +52,13 @@ body {
     margin-bottom: 10px;
 }
 
-.user-icon {
-    width: 30px; 
-    height: 30px; 
+.profile_pic {
     border-radius: 50%;
-    margin-right: 10px;
-    background-image: url('/static/guest_icon.png'); 
-    background-position: center; 
-    background-size: contain; 
+    width: 30px;
+    margin: 5px;
+    height: auto;
+    max-width: 500px; 
+    max-height: 500px;
+    object-fit: cover; 
+    aspect-ratio: 1 / 1; 
 }

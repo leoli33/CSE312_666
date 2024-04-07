@@ -55,14 +55,9 @@ body {
 .container {
     width: 70vw;
     place-items: center;
-    position: relative;
     overflow: hidden;
     overflow-y: auto;
-    margin-top: 38px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    padding-top: 38px;
     height: 100vh;
     margin: 0 auto; 
 }
