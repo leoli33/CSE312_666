@@ -5,6 +5,7 @@ from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
 import pymongo, bcrypt, string, random
+import os
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["CSE312_666"]
@@ -14,9 +15,13 @@ replies_collection = db['Replies']
 cred_collection = db["cred"]
 
 app = Flask(__name__)
+app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app)
 
-def get_username():
+# cred_collection.delete_many({})
+
+
+def get_user_email():
     auth_cook = request.cookies.get('auth_token')
 
     if auth_cook != None and auth_cook != "":
@@ -33,7 +38,7 @@ def security(response):
 
 @app.route('/')
 def home():
-    user_email = get_username()
+    user_email = get_user_email()
     return render_template('index.html', user_email=user_email)
 
 @app.route('/signup_page')
@@ -49,6 +54,13 @@ def signup():
         password = str(request.form['password'])
         confirm_pass = str(request.form['password_confirm'])
 
+        id = 0
+        for ele in cred_collection.find():
+            if 'id' in ele:
+                if ele['id'] > id:
+                    id = int(ele['id'])
+        id = id + 1
+
 
         if cred_collection.find_one({'email': email}) or email == 'Guest': #check email exists
           
@@ -60,7 +72,7 @@ def signup():
             
             else: #success
                 hashed_pass = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-                cred_collection.insert_one({"email":email,"password":hashed_pass})
+                cred_collection.insert_one({"email":email,"password":hashed_pass,'id':id})
                 return redirect(url_for('login_page'))
         
 @app.route('/login_page')
@@ -82,7 +94,7 @@ def login():
                 auth_tok = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=N))
                 hashed_token = bcrypt.hashpw(auth_tok.encode(), bcrypt.gensalt())
 
-                cred_collection.update_one({"email":doc["email"], "password":doc["password"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], "auth_token": hashed_token}})
+                cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id']}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],"auth_token": hashed_token}})
 
                 response = make_response(redirect(url_for('home')))
                 response.set_cookie('auth_token', auth_tok, max_age = 3600, httponly = True)
@@ -100,15 +112,15 @@ def logout():
 
             if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
 
-                cred_collection.update_one({"email":doc["email"] ,"password":doc["password"],"auth_token":doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], "auth_token": ""}})
+                cred_collection.update_one({"email":doc["email"] ,"password":doc["password"],'id':doc['id'],"auth_token":doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"],'id':doc["id"], "auth_token": ""}})
                 response = make_response(redirect(url_for('home')))
                 response.set_cookie('auth_token', "", expires = 0, httponly = True)
                 return response
 
-##################发帖子相关 function##################
+##################post function##################
 @app.route('/explore')
 def posts_list_html():
-    user_email = get_username()
+    user_email = get_user_email()
     if user_email == 'Guest':
         return redirect(url_for('login_page'))
     
@@ -137,7 +149,7 @@ def submit_post():
     data = request.json
     title = data['title']
     content = data['content']
-    author_email = get_username()
+    author_email = get_user_email()
 
     title = title.replace("&amp;","&")
     title = title.replace("&lt;","<")
@@ -184,7 +196,7 @@ def submit_reply():
     data = request.json
     thread_id = data['threadId']
     content = data['content']
-    author_email = get_username()
+    author_email = get_user_email()
 
     content = content.replace("&amp;","&")
     content = content.replace("&lt;","<")
@@ -205,7 +217,7 @@ def submit_reply():
     
 @app.route('/my_posts')
 def my_posts():
-    user_email = get_username()
+    user_email = get_user_email()
     if user_email == 'Guest':
         return redirect(url_for('login_page'))
     
@@ -231,24 +243,84 @@ def my_posts():
     return render_template('my_posts.html', posts=user_posts)
 
 
-##################posting unction##################
+##################posting function##################
 
 @app.route('/message', methods=['GET', 'POST', 'PUT'])
 def message():
-    username = get_username()
+    username = get_user_email()
     if username == 'Guest':
         return redirect(url_for('login_page'))
     
+    doc = cred_collection.find_one({'email': username})
+    if 'new_username' in doc:
+            username = doc['new_username']
+            
     load_messages = list(chat_collection.find()) #load message from data base into list
     return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
     
 @socketio.on("chat_message")
 def user_input(message):
+    username = get_user_email()
+    doc = cred_collection.find_one({'email': username})
+    get_photo_path = ""
+    if 'photo_path' in doc:
+        get_photo_path = doc['photo_path']
+    else:
+        get_photo_path = "./static/profile_images/default.png"
+        
     sender = message["sender"]
     messages = (message["message"])
-    chat_collection.insert_one({"username": sender, "message": messages})
-    emit("load_chat", {"username": sender, "message": messages},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
+    chat_collection.insert_one({"username": sender, "message": messages, "profile_pic": get_photo_path})
+    emit("load_chat", {"username": sender, "message": messages, "profile_pic": get_photo_path},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
+
+@app.route('/profile', methods=['POST','GET'])
+def profile():
+    user_email = get_user_email()
+    if user_email == 'Guest':
+        return redirect(url_for('login_page'))
+    
+    doc = cred_collection.find_one({'email': user_email})
+    
+    get_photo_path = "Nothing"
+    if request.method == "GET":
+        if 'photo_path' in doc:
+            get_photo_path = doc['photo_path']
+        else:
+            get_photo_path = "./static/profile_images/default.png"
+            
+        if 'new_username' in doc:
+            user_email = doc['new_username']
+
+        return render_template('profile.html',user_email=user_email, get_photo_path=get_photo_path)
+    
+    elif request.method == "POST":
+        if 'uploaded_pic' in request.files:
+            photo = request.files['uploaded_pic']
+            photo_header = photo.read(64)
+            photo.seek(0)
+            pnghex = "89504E470D0A1A0A"
+            png =bytes.fromhex(pnghex)
+
+            im_type = ''
+            if photo_header.startswith(b'\xFF\xD8'): #jpeg&jpg
+                im_type = '.jpeg'
+            elif photo_header.startswith(png): #png
+                im_type = '.png'
+
+            filename = 'profile_pic_'+str(doc['id'])+im_type
+            path = os.path.join('./static/profile_images',filename)
+            photo.save(path)
+
+            cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'photo_path':path}})
+
+            return redirect(url_for('profile'))
+        
+        elif 'username' in request.form:
+            new_name = request.form.get('username')
+            cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'new_username':new_name}})
+                    
+            return redirect(url_for('profile'))
 
 if __name__ == '__main__':
    app.run(debug=True, host='0.0.0.0', port=8080)

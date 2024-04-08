@@ -1,19 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Message</title>
+{% extends 'base.html' %}
+
+{% block title %}Message{% endblock %}
+
+{% block content %}
     <link rel="stylesheet" type="text/css" href="/static/css/message.css">
     <link rel="shortcut icon" type="image/x-icon" href="/static/icons/logo.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-</head>
-<body>
     <div class="chat">
         <div class="chat-messages" id="chat-messages">
             <!-- Messages will be displayed here -->
             {% for message in messages %} <!--load messages from database-->
             <div class="message-container">
+                <img src="{{ message.profile_pic }}" class="profile_pic" alt="Profile Picture">
                 <default>{{ message.username }}: {{ message.message }}</default> <!--in this format-->
             </div>
             {% endfor %}
@@ -28,5 +26,4 @@
         var username = "{{username}}"; 
     </script>
     <script src="/static/js/message.js"></script>
-</body>
-</html>
+{% endblock %}
