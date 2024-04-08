@@ -52,13 +52,12 @@ body {
     margin-bottom: 10px;
 }
 
-.profile_pic {
+.profile-pic {
     border-radius: 50%;
     width: 30px;
-    margin: 5px;
-    height: auto;
-    max-width: 500px; 
-    max-height: 500px;
+    height: 30px;
+    margin-right: 5px;
     object-fit: cover; 
-    aspect-ratio: 1 / 1; 
+    aspect-ratio: 1 / 1;
+    box-shadow: 1px 1px 5px lightgray;
 }

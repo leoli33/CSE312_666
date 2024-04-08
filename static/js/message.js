@@ -15,10 +15,19 @@ chatForm.addEventListener('submit',function(event) {
 socket.on("load_chat", function(data) {
     const sender = data.username;
     const message = data.message;
+    const profilePic = data.profile_pic;
+    
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message-container');
     const messageElement = document.createElement('default');
     messageElement.textContent = sender + ": " + message;
+
+    // Create and append the image element
+    const imgElement = document.createElement('img');
+    imgElement.src = profilePic;
+    imgElement.classList.add('profile-pic');
+    messageDiv.appendChild(imgElement);
+
     messageDiv.appendChild(messageElement);
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;

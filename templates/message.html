@@ -11,7 +11,7 @@
             <!-- Messages will be displayed here -->
             {% for message in messages %} <!--load messages from database-->
             <div class="message-container">
-                <img src="{{ message.profile_pic }}" class="profile_pic" alt="Profile Picture">
+                <img src="{{ message.profile_pic }}" class="profile-pic">
                 <default>{{ message.username }}: {{ message.message }}</default> <!--in this format-->
             </div>
             {% endfor %}
