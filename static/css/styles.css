@@ -55,13 +55,13 @@ body {
 .container {
     display: flex;
     flex-direction: column;
-    width: 70vw;
+    width: 90vw;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     place-items: center;
     overflow: hidden;
     overflow-y: auto;
-    padding-top: 38px;
+    padding-top: 50px;
     height: calc(100vh - 60px);
     margin: 0 auto;
     box-sizing: border-box; 
