@@ -16,7 +16,7 @@ cred_collection = db["cred"]
 
 app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
-socketio = SocketIO(app)
+socketio = SocketIO(app, transports=['websocket'])
 
 # cred_collection.delete_many({})
 
