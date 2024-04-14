@@ -56,6 +56,7 @@
 #replies-container {
     padding: 20px;
     background: #e9e9e9;
+    width: 100vh;
 }
 
 .reply {
@@ -69,6 +70,7 @@
     word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-all;
+    width: 100vh;
 }
 .reply p {
     text-align: left;
