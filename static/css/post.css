@@ -1,5 +1,6 @@
 .post-container-top-space {
-    margin-top: 50px; 
+    margin-top: 0;
+    padding-top: 10px; 
 }
 .icon {
     width: 40px;
@@ -31,52 +32,32 @@
     cursor: pointer;
     z-index: 10;
 }
+
+
 .post-summary {
     cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 4px;
     display: flex;
-    margin: 10px 0;
+    margin: 10px auto;
     justify-content: space-between;
     align-items: center;
     padding: 10px;
     border-bottom: 1px solid #ccc;
-    background: #ffffff; 
+    background: #ffffff;
+    width: 100vh;
+    box-sizing: border-box; 
 }
+
 .post-summary:hover {
     background-color: #f9f9f9; 
 }
 
-
-/* Sidebar styles */
-.top-nav {
-    background-color: #f3c0c0; 
+.post-summary h3 {
+    white-space: nowrap; 
     overflow: hidden;
-    display: flex;
-    justify-content: flex-end; 
-    padding: 14px 20px;
-}
-
-.top-nav a {
-    float: left; 
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 17px;
-    border-radius: 10px; 
-    margin-left: 10px; 
-}
-
-.top-nav a:hover {
-    background-color: #ddd;
-    color: black;
-}
-
-.top-nav a.active {
-    background-color: #04AA6D;
-    color: white;
+    text-overflow: ellipsis; 
+    width: 70%; 
 }
 
 .sidebar {

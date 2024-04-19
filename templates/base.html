@@ -9,17 +9,15 @@
     <link rel="shortcut icon" type="image/x-icon" href="/static/icons/logo.png">
 </head>
 <body>
-    <div id="openNav" class="nav">
-        <img src="/static/icons/menu.png" class="menu_icon" onclick="sidebar_open()">
+    
+    <div class="tab">
+        <img src="/static/icons/menu.png" class="menu_icon" onclick="sidebar_open()" style="float:left;">
+        <a href="/">Home</a>
+        <a href="/explore">Explore</a>
+        <a href="/my_posts">My Posts</a>
     </div>
 
     <div id="main">
-        
-        <div class="tab">
-            <button><a href="/">Home</a></button>
-            <button><a href="/explore">Explore</a></button>
-            <button><a href="/my_posts">My Posts</a></button>
-        </div>
         
         {% block content %}{% endblock %}
 
