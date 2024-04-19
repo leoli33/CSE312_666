@@ -5,6 +5,7 @@ from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
 import pymongo, bcrypt, string, random
+import os
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["CSE312_666"]
@@ -15,6 +16,9 @@ cred_collection = db["cred"]
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+
+# cred_collection.delete_many({})
+
 
 def get_username():
     auth_cook = request.cookies.get('auth_token')
@@ -36,6 +40,64 @@ def home():
     user_email = get_username()
     return render_template('index.html', user_email=user_email)
 
+@app.route('/profile', methods=['POST','GET'])
+def profile():
+    user_email = get_username()
+    get_photo_path = "Nothing"
+    if request.method == "GET":
+        for doc in cred_collection.find():
+            if doc["email"] == user_email:
+                if 'photo_path' in doc:
+                    get_photo_path = doc['photo_path']
+                else:
+                    get_photo_path = "./static/profile_images/default.png"
+                if 'new_username' in doc:
+                    user_email = doc['new_username']
+            else:
+                get_photo_path = "./static/profile_images/default.png"
+
+        return render_template('profile.html',user_email=user_email, get_photo_path=get_photo_path)
+    elif request.method == "POST":
+        if 'uploaded_pic' in request.files:
+            photo = request.files['uploaded_pic']
+            id = 0
+            for doc in cred_collection.find():
+                if doc["email"] == user_email:
+                    id = doc['id']
+
+            photo_header = photo.read(64)
+            photo.seek(0)
+        
+            pnghex = "89504E470D0A1A0A"
+            png =bytes.fromhex(pnghex)
+
+            im_type = ''
+            
+            if photo_header.startswith(b'\xFF\xD8'): #jpeg&jpg
+                im_type = '.jpeg'
+
+            elif photo_header.startswith(png): #png
+                im_type = '.png'
+
+            filename = 'profile_pic_'+str(id)+im_type
+            path = os.path.join('./static/profile_images',filename)
+
+            photo.save(path)
+
+            for doc in cred_collection.find():
+                if doc["email"] == user_email:
+                    cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'photo_path':path}})
+
+            print(path)
+            return redirect(url_for('profile'))
+        elif 'username' in request.form:
+            new_name = request.form.get('username')
+            for doc in cred_collection.find():
+                if doc["email"] == user_email:
+                    cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'new_username':new_name}})
+                    
+            return redirect(url_for('profile'))
+
 @app.route('/signup_page')
 def signup_page():
      return render_template('register.html')
@@ -49,6 +111,13 @@ def signup():
         password = str(request.form['password'])
         confirm_pass = str(request.form['password_confirm'])
 
+        id = 0
+        for ele in cred_collection.find():
+            if 'id' in ele:
+                if ele['id'] > id:
+                    id = int(ele['id'])
+        id = id + 1
+
 
         if cred_collection.find_one({'email': email}) or email == 'Guest': #check email exists
           
@@ -60,7 +129,7 @@ def signup():
             
             else: #success
                 hashed_pass = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-                cred_collection.insert_one({"email":email,"password":hashed_pass})
+                cred_collection.insert_one({"email":email,"password":hashed_pass,'id':id})
                 return redirect(url_for('login_page'))
         
 @app.route('/login_page')
@@ -82,7 +151,7 @@ def login():
                 auth_tok = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=N))
                 hashed_token = bcrypt.hashpw(auth_tok.encode(), bcrypt.gensalt())
 
-                cred_collection.update_one({"email":doc["email"], "password":doc["password"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], "auth_token": hashed_token}})
+                cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id']}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],"auth_token": hashed_token}})
 
                 response = make_response(redirect(url_for('home')))
                 response.set_cookie('auth_token', auth_tok, max_age = 3600, httponly = True)
@@ -100,7 +169,7 @@ def logout():
 
             if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
 
-                cred_collection.update_one({"email":doc["email"] ,"password":doc["password"],"auth_token":doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], "auth_token": ""}})
+                cred_collection.update_one({"email":doc["email"] ,"password":doc["password"],'id':doc['id'],"auth_token":doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"],'id':doc["id"], "auth_token": ""}})
                 response = make_response(redirect(url_for('home')))
                 response.set_cookie('auth_token', "", expires = 0, httponly = True)
                 return response

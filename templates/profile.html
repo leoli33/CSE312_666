@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>{{ user_email }}'s profile!</h2>
+        <img src="{{ get_photo_path }}">
+        <h1>Upload profile picture here!</h1>
+        <form action="/profile" method="post" enctype="multipart/form-data">
+            <input type="file" name="uploaded_pic" accept=".png,.jpg,.jpeg">
+            <input type="submit" value="Upload">
+        </form>  
+
+        <h1>Update Name</h1>
+        <form action="/profile" method="post">
+            <input type="text" name="username" placeholder="new username">
+            <input type="submit" value="Update">
+        </form>
+    </div>
+{% endblock %}
