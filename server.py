@@ -14,15 +14,9 @@ posts_collection = db["Posts"]
 replies_collection = db['Replies']
 cred_collection = db["cred"]
 
-# listen 443 ssl; # managed by Certbot
-# ssl_certificate /etc/letsencrypt/live/cupid-666.me/fullchain.pem; # managed by Certbot
-# ssl_certificate_key /etc/letsencrypt/live/cupid-666.me/privkey.pem; # managed by Certbot
-# include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-# ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
 app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
-socketio = SocketIO(app, transports=['websocket'] )
+socketio = SocketIO(app, transports=['websocket'])
 
 # cred_collection.delete_many({})
 
@@ -329,4 +323,4 @@ def profile():
             return redirect(url_for('profile'))
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080, ssl_context=('../etc/letsencrypt/live/cupid-666.me/fullchain.pem', '../etc/letsencrypt/live/cupid-666.me/privkey.pem'))
+   app.run(debug=True, host='0.0.0.0', port=8080)
