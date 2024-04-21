@@ -1,4 +1,4 @@
-const socket = io('wss://cupid-666.me', {transports: ['websocket']});
+const socket = io('wss://cupid-666.me/message', {transports: ['websocket']});
 const chatMessages = document.getElementById("chat-messages");
 const clearButton = document.getElementById("clear-button");
 const chatForm = document.getElementById('chat-form');
