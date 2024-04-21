@@ -266,7 +266,7 @@ def user_input(message):
     if 'photo_path' in doc:
         get_photo_path = doc['photo_path']
     else:
-        get_photo_path = "./static/profile_images/default.png"
+        get_photo_path = "/static/profile_images/default.png"
         
     sender = message["sender"]
     messages = (message["message"])
