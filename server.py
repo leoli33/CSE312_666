@@ -245,7 +245,7 @@ def my_posts():
 
 ##################posting function##################
 
-@app.route('/message', methods=['GET', 'POST', 'PUT'])
+@app.route('/message',strict_slashes=False, methods=['GET', 'POST', 'PUT'])
 def message():
     username = get_user_email()
     if username == 'Guest':
