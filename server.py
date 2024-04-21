@@ -6,7 +6,6 @@ from bson import ObjectId
 from datetime import datetime
 import pymongo, bcrypt, string, random
 import os
-import ssl
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["CSE312_666"]
@@ -15,24 +14,9 @@ posts_collection = db["Posts"]
 replies_collection = db['Replies']
 cred_collection = db["cred"]
 
-
-
-    # listen 443 ssl; # managed by Certbot
-    # ssl_certificate /etc/letsencrypt/live/cupid-666.me/fullchain.pem; # managed by Certbot
-    # ssl_certificate_key /etc/letsencrypt/live/cupid-666.me/privkey.pem; # managed by Certbot
-    # include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
-
-certificate_F = '/etc/letsencrypt/live/cupid-666.me/fullchain.pem'
-private_K = '/etc/letsencrypt/live/cupid-666.me/privkey.pem'
-
-ssl_info = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-ssl_info.load_cert_chain(certificate_F, keyfile= private_K)
-
 app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
-socketio = SocketIO(app, transports=['websocket'], ssl_info=ssl_info)
+socketio = SocketIO(app, transports=['websocket'])
 
 # cred_collection.delete_many({})
 
