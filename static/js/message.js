@@ -1,4 +1,4 @@
-const socket = io({transports:['websocket']});
+var socket = io.connect('wss://cupid-666.me');
 const chatMessages = document.getElementById("chat-messages");
 const clearButton = document.getElementById("clear-button");
 const chatForm = document.getElementById('chat-form');
