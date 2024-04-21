@@ -329,4 +329,4 @@ def profile():
             return redirect(url_for('profile'))
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080, ssl_context=('/etc/letsencrypt/live/cupid-666.me/fullchain.pem', '/etc/letsencrypt/live/cupid-666.me/privkey.pem'))
+    app.run(debug=True, host='0.0.0.0', port=8080, ssl_context=('../etc/letsencrypt/live/cupid-666.me/fullchain.pem', '../etc/letsencrypt/live/cupid-666.me/privkey.pem'))
