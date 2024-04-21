@@ -19,6 +19,11 @@ def get_useremail(request):
 def find_user(data:dict):
     return cred_collection.find_one(data)
 
+def find_usr_name(data:dict):
+    doc = cred_collection.find_one(data)
+    if doc != None and "email" in doc:
+        return doc['email']
+
 def add_user(data:dict):
     cred_collection.insert_one(data)
 
@@ -33,3 +38,16 @@ def valid_user_name(email:str):
     
 def get_all_post():
     return list(posts_collection.find())
+
+def get_user_email(request):
+    auth_cook = request.cookies.get('auth_token')
+
+    if auth_cook != None and auth_cook != "":
+        for doc in cred_collection.find({},{'_id' : False}):
+
+            if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
+                return doc["email"]
+    return 'Guest'
+
+def find_all_cred():
+    return cred_collection.find()
