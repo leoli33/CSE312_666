@@ -6,7 +6,6 @@ from bson import ObjectId
 from datetime import datetime
 import pymongo, bcrypt, string, random
 import os
-import ssl
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["CSE312_666"]
