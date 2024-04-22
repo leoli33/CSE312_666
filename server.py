@@ -252,10 +252,14 @@ def message():
         return redirect(url_for('login_page'))
     
     doc = cred_collection.find_one({'email': username})
+    current_avatar_path = doc.get('photo_path', '/static/profile_images/default.png')
+
     if 'new_username' in doc:
             username = doc['new_username']
             
     load_messages = list(chat_collection.find()) #load message from data base into list
+    for message in load_messages:
+        message['profile_pic'] = current_avatar_path.replace('./','/')
     return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
     
 @socketio.on("chat_message")
