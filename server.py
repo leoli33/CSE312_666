@@ -268,7 +268,7 @@ def user_input(message):
     doc = cred_collection.find_one({'email': username})
     get_photo_path = ""
     if 'photo_path' in doc:
-        get_photo_path = doc['photo_path'].replace('./','/')
+        get_photo_path = doc['photo_path']
     else:
         get_photo_path = "/static/profile_images/default.png"
         
