@@ -269,11 +269,12 @@ def user_input(message):
     username = get_user_email()
     user_doc  = cred_collection.find_one({'email': username})
     user_id = user_doc.get('id')
- 
+    current_avatar_path = user_doc.get('photo_path', './static/profile_images/default.png').replace('./', '/')
+
     sender = message["sender"]
     messages = (message["message"])
     chat_collection.insert_one({"user_id": user_id,"message": messages})
-    emit("load_chat", {"username": sender, "message": messages},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
+    emit("load_chat", {"username": sender, "message": messages,"profile_pic": current_avatar_path},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
 
 @app.route('/profile', methods=['POST','GET'])
