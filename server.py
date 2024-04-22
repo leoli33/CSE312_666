@@ -251,11 +251,17 @@ def message():
     if username == 'Guest':
         return redirect(url_for('login_page'))
     
-    load_messages = list(chat_collection.find()) #load message from data base into list
+    load_messages = list(chat_collection.find())  # load messages from database into list
     for message in load_messages:
-        user_doc = cred_collection.find_one({'email': message["username"]})
-        message['profile_pic'] = user_doc.get('photo_path', '/static/profile_images/default.png').replace('./','/')
-
+        if 'username' in message:
+            user_doc = cred_collection.find_one({'email': message['username']})
+            if user_doc:
+                message['profile_pic'] = user_doc.get('photo_path', '/static/profile_images/default.png').replace('./','/')
+            else:
+                message['profile_pic'] = '/static/profile_images/default.png'
+        else:
+            message['profile_pic'] = '/static/profile_images/default.png'
+ 
     doc = cred_collection.find_one({'email': username})
 
     if 'new_username' in doc:
