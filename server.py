@@ -244,49 +244,34 @@ def my_posts():
 
 
 ##################posting function##################
-
-@app.route('/message',strict_slashes=False, methods=['GET', 'POST', 'PUT'])
+@app.route('/message', strict_slashes=False, methods=['GET', 'POST', 'PUT'])
 def message():
     username = get_user_email()
     if username == 'Guest':
         return redirect(url_for('login_page'))
     
-    load_messages = list(chat_collection.find())  # load messages from database into list
-    for message in load_messages:
-        if 'username' in message:
-            user_doc = cred_collection.find_one({'email': message['username']})
-            if user_doc:
-                message['profile_pic'] = user_doc.get('photo_path', '/static/profile_images/default.png').replace('./','/')
-            else:
-                message['profile_pic'] = '/static/profile_images/default.png'
-        else:
-            message['profile_pic'] = '/static/profile_images/default.png'
- 
     doc = cred_collection.find_one({'email': username})
-
     if 'new_username' in doc:
             username = doc['new_username']
             
+    load_messages = list(chat_collection.find()) #load message from data base into list
     return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
+    
     
 @socketio.on("chat_message")
 def user_input(message):
     username = get_user_email()
-    #doc = cred_collection.find_one({'email': username})
-    # get_photo_path = ""
-    # if 'photo_path' in doc:
-    #     get_photo_path = doc['photo_path']
-    # else:
-    #     get_photo_path = "/static/profile_images/default.png"
+    doc = cred_collection.find_one({'email': username})
+    get_photo_path = ""
+    if 'photo_path' in doc:
+         get_photo_path = doc['photo_path']
+    else:
+        get_photo_path = "/static/profile_images/default.png"
         
     sender = message["sender"]
     messages = (message["message"])
-    #chat_collection.insert_one({"username": sender, "message": messages, "profile_pic": get_photo_path})
-    chat_collection.insert_one({"username": sender, "message": messages})
-
-    #emit("load_chat", {"username": sender, "message": messages, "profile_pic": get_photo_path},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
-    emit("load_chat", {"username": sender, "message": messages}, broadcast=True)
-
+    chat_collection.insert_one({"username": sender, "message": messages, "profile_pic": get_photo_path})
+    emit("load_chat", {"username": sender, "message": messages, "profile_pic": get_photo_path},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
 
 @app.route('/profile', methods=['POST','GET'])
