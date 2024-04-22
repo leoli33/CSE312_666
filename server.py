@@ -258,7 +258,7 @@ def message():
     for message in load_messages:
         user_doc = cred_collection.find_one({'id': message['user_id']})
         message['username'] = user_doc.get('new_username', user_doc['email'])
-        message['profile_pic'] = user_doc.get('photo_path', '/static/profile_images/default.png')
+        message['profile_pic'] = user_doc.get('photo_path', './static/profile_images/default.png').replace('./','/')
 
 
     return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
