@@ -18,7 +18,8 @@ app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app,cors_allowed_origins="*",transports=['websocket'])
 
-# cred_collection.delete_many({})
+#cred_collection.delete_many({})
+#chat_collection.delete_many({})
 
 
 def get_user_email():
@@ -254,14 +255,11 @@ def message():
     user_id = user_doc.get('id')
 
     load_messages = list(chat_collection.find())
-    # doc = cred_collection.find_one({'email': username})
-    # if 'new_username' in doc:
-    #         username = doc['new_username']
-            
-    # load_messages = list(chat_collection.find()) #load message from data base into list
     for message in load_messages:
         user_doc = cred_collection.find_one({'id': message['user_id']})
         message['username'] = user_doc.get('new_username', user_doc['email'])
+        message['profile_pic'] = user_doc.get('photo_path', '/static/profile_images/default.png')
+
 
     return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
     
@@ -271,18 +269,11 @@ def user_input(message):
     username = get_user_email()
     user_doc  = cred_collection.find_one({'email': username})
     user_id = user_doc.get('id')
-
-    get_photo_path = ""
-    if 'photo_path' in user_doc:
-         get_photo_path = user_doc['photo_path']
-    else:
-        get_photo_path = "/static/profile_images/default.png"
-        
+ 
     sender = message["sender"]
     messages = (message["message"])
-    # chat_collection.insert_one({"username": sender, "message": messages, "profile_pic": get_photo_path})
-    chat_collection.insert_one({"user_id": user_id,"message": messages,"profile_pic": get_photo_path})
-    emit("load_chat", {"username": sender, "message": messages, "profile_pic": get_photo_path},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
+    chat_collection.insert_one({"user_id": user_id,"message": messages})
+    emit("load_chat", {"username": sender, "message": messages},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
 
 @app.route('/profile', methods=['POST','GET'])
