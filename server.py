@@ -14,13 +14,11 @@ posts_collection = db["Posts"]
 replies_collection = db['Replies']
 cred_collection = db["cred"]
 
+# posts_collection.delete_many({})
+
 app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
-socketio = SocketIO(app,cors_allowed_origins="*",transports=['websocket'])
-
-#cred_collection.delete_many({})
-#chat_collection.delete_many({})
-
+socketio = SocketIO(app, transports=['websocket'])
 
 def get_user_email():
     auth_cook = request.cookies.get('auth_token')
@@ -190,8 +188,6 @@ def post_detail(post_id):
     else:
         return "Post not found", 404
 
-
-
 @app.route('/submit-reply', methods=['POST'])
 def submit_reply():
     data = request.json
@@ -215,7 +211,6 @@ def submit_reply():
     else:
         return jsonify({'result': 'error', 'message': 'Failed to insert reply'}), 500
 
-    
 @app.route('/my_posts')
 def my_posts():
     user_email = get_user_email()
@@ -243,38 +238,56 @@ def my_posts():
             post['last_reply_time'] = post['posting_time']
     return render_template('my_posts.html', posts=user_posts)
 
+@app.route('/search', methods=['GET'])
+def search():
+    search_result = request.args.get('search', '')
+    search_result = search_result.replace("&amp;","&")
+    search_result = search_result.replace("&lt;","<")
+    search_result = search_result.replace("&gt;",">")
 
+    if search_result != '' and search_result != None:
+
+        regex = {'$regex': search_result, '$options': 'i'}
+        search_results = list(posts_collection.find({'title': regex}))
+
+        for post in search_results:
+            content = post.get('content', '')
+            post['content_preview'] = content.split('\n')[0] if content else ''
+            post['posting_time'] = post.get('_id').generation_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+        return render_template('post.html', posts=search_results)
+    else: 
+        return redirect("/explore")
+    
 ##################posting function##################
-@app.route('/message', strict_slashes=False, methods=['GET', 'POST', 'PUT'])
+
+@app.route('/message', methods=['GET', 'POST', 'PUT'])
 def message():
     username = get_user_email()
     if username == 'Guest':
         return redirect(url_for('login_page'))
     
-    user_doc = cred_collection.find_one({'email': username})
-    user_id = user_doc.get('id')
-
-    load_messages = list(chat_collection.find())
-    for message in load_messages:
-        user_doc = cred_collection.find_one({'id': message['user_id']})
-        message['username'] = user_doc.get('new_username', user_doc['email'])
-        message['profile_pic'] = user_doc.get('photo_path', './static/profile_images/default.png').replace('./','/')
-
-
+    doc = cred_collection.find_one({'email': username})
+    if 'new_username' in doc:
+            username = doc['new_username']
+            
+    load_messages = list(chat_collection.find()) #load message from data base into list
     return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
-    
     
 @socketio.on("chat_message")
 def user_input(message):
     username = get_user_email()
-    user_doc  = cred_collection.find_one({'email': username})
-    user_id = user_doc.get('id')
-    current_avatar_path = user_doc.get('photo_path', './static/profile_images/default.png').replace('./', '/')
-
+    doc = cred_collection.find_one({'email': username})
+    get_photo_path = ""
+    if 'photo_path' in doc:
+        get_photo_path = doc['photo_path']
+    else:
+        get_photo_path = "./static/profile_images/default.png"
+        
     sender = message["sender"]
     messages = (message["message"])
-    chat_collection.insert_one({"user_id": user_id,"message": messages})
-    emit("load_chat", {"username": sender, "message": messages,"profile_pic": current_avatar_path},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
+    chat_collection.insert_one({"username": sender, "message": messages, "profile_pic": get_photo_path})
+    emit("load_chat", {"username": sender, "message": messages, "profile_pic": get_photo_path},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
 
 @app.route('/profile', methods=['POST','GET'])
