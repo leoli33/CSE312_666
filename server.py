@@ -16,7 +16,7 @@ import pymongo, bcrypt, string, random, os
 
 app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
-socketio = SocketIO(app, transports=['websocket'])
+socketio = SocketIO(app,cors_allowed_origins="*",transports=['websocket'])
 
 # cred_collection.delete_many({})
 
@@ -235,8 +235,7 @@ def my_posts():
 
 
 ##################posting function##################
-
-@app.route('/message', methods=['GET', 'POST', 'PUT'])
+@app.route('/message', strict_slashes=False, methods=['GET', 'POST', 'PUT'])
 def message():
     username = database.get_user_email(request)
     if username == 'Guest':
@@ -248,6 +247,7 @@ def message():
             
     load_messages = list(database.chat_collection.find()) #load message from data base into list
     return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
+    
     
 @socketio.on("chat_message")
 def user_input(message):

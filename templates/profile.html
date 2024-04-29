@@ -7,6 +7,7 @@
         <h2>{{ user_email }}'s profile!</h2>
         <img src="{{ get_photo_path }}" class="profile-picccc" alt="Profile Picture">
         <h1>Upload profile picture here!</h1>
+        <p>Upload one of the following: jpg, jpeg, png</p>
         <form action="/profile" method="post" enctype="multipart/form-data">
             <input type="file" name="uploaded_pic" accept=".png,.jpg,.jpeg">
             <input type="submit" value="Upload">
