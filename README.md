@@ -8,7 +8,7 @@ Porject part 3 additional feature testing procedure:
 
 1. Start your server using docker compose up
 2. Open two browsers and navigate to http://localhost:8080/
-3. Create an account and login in both browsers
+3. Create an account and login
 4. Navigate to explore on the top of right hand side
 5. Make 2 posts with unique title, but exists some common substring
     1. ei. Title abc and title bcd
