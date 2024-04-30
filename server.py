@@ -217,26 +217,29 @@ def message():
     if username == 'Guest':
         return redirect(url_for('login_page'))
     
-    doc = database.find_user(username)
-    if 'new_username' in doc:
-        username = doc['new_username']
-            
-    load_messages = list(database.chat_collection.find()) #load message from data base into list
-    return render_template('message.html', username=username, messages=load_messages) #render message along with username to the update ones
+    user_doc = database.find_user(username)
+
+    load_messages = list(database.chat_collection.find())
+    for message in load_messages:
+        user_doc = database.cred_collection.find_one({'id': message['user_id']})
+        message['username'] = user_doc.get('new_username', user_doc['email'])
+        message['profile_pic'] = user_doc.get('photo_path', './static/profile_images/default.png').replace('./','/')
+
+
+    return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
     
     
 @socketio.on("chat_message")
 def user_input(message):
     username = database.get_user_email(request)
-    doc = database.cred_collection.find_one({'email': username})
-    get_photo_path = "./static/profile_images/default.png"
-    if 'photo_path' in doc:
-        get_photo_path = doc['photo_path']
-        
+    user_doc = database.find_user(username)
+    user_id = user_doc.get('id')
+    current_avatar_path = user_doc.get('photo_path', './static/profile_images/default.png').replace('./', '/')
+
     sender = message["sender"]
     messages = (message["message"])
-    database.chat_collection.insert_one({"username": sender, "message": messages, "profile_pic": get_photo_path})
-    emit("load_chat", {"username": sender, "message": messages, "profile_pic": get_photo_path}, broadcast=True) #when load chat is broadcast can show allow other users to update their messages
+    database.chat_collection.insert_one({"user_id": user_id,"message": messages})
+    emit("load_chat", {"username": sender, "message": messages,"profile_pic": current_avatar_path},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
 ################## message function end ##################
 
