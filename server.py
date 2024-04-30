@@ -1,25 +1,14 @@
 
-from flask import Flask, request, render_template, send_from_directory, jsonify, redirect, url_for, flash, make_response
+from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, make_response
 from flask_socketio import SocketIO, emit
-from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
 from util import database
-import pymongo, bcrypt, string, random, os
-
-# mongo_client = MongoClient("mongo")
-# db = mongo_client["CSE312_666"]
-# chat_collection = db["Chat_room"]
-# posts_collection = db["Posts"]
-# replies_collection = db['Replies']
-# cred_collection = db["cred"]
+import pymongo, bcrypt, os, secrets, hashlib
 
 app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app,cors_allowed_origins="*",transports=['websocket'])
-
-# cred_collection.delete_many({})
-
 
 @app.after_request
 def security(response):
@@ -31,84 +20,75 @@ def home():
     user_email = database.get_user_email(request)
     return render_template('index.html', user_email=user_email)
 
+################## auth function start ##################
 @app.route('/signup_page')
 def signup_page():
-     return render_template('register.html')
+    return render_template('register.html')
 
 @app.route('/signup', methods=['POST'])
 def signup():
+    email = str(request.form['email'])
+    password = str(request.form['password'])
+    confirm_pass = str(request.form['password_confirm'])
 
-    if request.method == 'POST':
-
-        email = str(request.form['email'])
-        password = str(request.form['password'])
-        confirm_pass = str(request.form['password_confirm'])
-
-        id = 0
-        for ele in database.find_all_cred():
-            if 'id' in ele:
-                if ele['id'] > id:
-                    id = int(ele['id'])
-        id = id + 1
-
-
-        if database.find_user({'email': email}) or email == 'Guest': #check email exists
-          
-            return render_template('register.html')
-        else:
-
-            if password != confirm_pass: #password does not match
-                return render_template('register.html')
-            
-            else: #success
-                hashed_pass = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-                info = {"email":email,"password":hashed_pass,'id':id}
-                database.add_user(info)
-                return redirect(url_for('login_page'))
+    if '@' not in email or invalid_char(email):
+        flash('This is not an email.', 'info')
+        return redirect(url_for('signup_page'))
+    
+    if database.find_user(email): #check email exists
+        flash('Email already existed.', 'info')
+        return redirect(url_for('signup_page'))
+    
+    if len(password) < 8 or invalid_char(password):
+        flash('Invalid password.', 'info')
+        return redirect(url_for('signup_page'))
         
+    if password != confirm_pass: #password does not match
+        flash('Passwords do not match.', 'info')
+        return redirect(url_for('signup_page'))
+        
+    #success
+    hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    user = {"email": email, "password": hashed_pw}
+    database.add_user(user)
+    
+    return redirect(url_for('login_page'))
+
 @app.route('/login_page')
 def login_page():
     return render_template('login.html')
-
+    
 @app.route('/login', methods=['POST'])
 def login():
-    if request.method == 'POST':
+    email = str(request.form['email'])
+    password = str(request.form['password'])
 
-        email = str(request.form['email'])
-        password = str(request.form['password'])
+    if database.valid_login(email, password):
+        token = secrets.token_urlsafe()
+        hashed_token = hashlib.sha256(token.encode()).hexdigest()
+        database.update_user_doc({"email": email}, {"token": hashed_token})
+        response = make_response(redirect(url_for('home')))
+        response.set_cookie('auth_token', token, max_age = 3600, httponly = True, secure=True)
+        return response
+    
+    flash('Login failed.', 'info')   
+    return redirect(url_for('login_page')) #login failed
 
-        for doc in database.cred_collection.find({},{'_id' : False}):
-
-            if email == doc["email"] and bcrypt.checkpw(password.encode(),doc["password"]): #can log in
-
-                N = 20
-                auth_tok = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=N))
-                hashed_token = bcrypt.hashpw(auth_tok.encode(), bcrypt.gensalt())
-
-                database.cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id']}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],"auth_token": hashed_token}})
-
-                response = make_response(redirect(url_for('home')))
-                response.set_cookie('auth_token', auth_tok, max_age = 3600, httponly = True)
-                return response
-            
-        return redirect(url_for('login_page')) #login failed
-
-@app.route('/logout',methods = ['POST','GET'])
+@app.route('/logout')
 def logout():
-    if request.method == "GET":
+    database.delete_token(request)
+    response = make_response(redirect(url_for('login_page')))
+    response.set_cookie('auth_token', "", expires = 0, httponly = True, secure=True)
+    return response
 
-        auth_cook = request.cookies.get('auth_token')
+def invalid_char(entry: str):
+    # does not contain any invalid characters
+    allowed_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&()-_=")
+    if set(entry) - allowed_chars != set():
+        return True
+    return False
 
-        for doc in database.cred_collection.find({},{'_id' : False}):
-
-            if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
-
-                database.cred_collection.update_one({"email":doc["email"] ,"password":doc["password"],'id':doc['id'],"auth_token":doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"],'id':doc["id"], "auth_token": ""}})
-                response = make_response(redirect(url_for('home')))
-                response.set_cookie('auth_token', "", expires = 0, httponly = True)
-                return response
-
-##################post function##################
+################## post function start ##################
 @app.route('/explore')
 def posts_list_html():
     user_email = database.get_user_email(request)
@@ -180,8 +160,6 @@ def post_detail(post_id):
     else:
         return "Post not found", 404
 
-
-
 @app.route('/submit-reply', methods=['POST'])
 def submit_reply():
     data = request.json
@@ -205,7 +183,6 @@ def submit_reply():
     else:
         return jsonify({'result': 'error', 'message': 'Failed to insert reply'}), 500
 
-    
 @app.route('/my_posts')
 def my_posts():
     user_email = database.get_user_email(request)
@@ -233,37 +210,35 @@ def my_posts():
             post['last_reply_time'] = post['posting_time']
     return render_template('my_posts.html', posts=user_posts)
 
-
-##################posting function##################
+################## message function start ##################
 @app.route('/message', strict_slashes=False, methods=['GET', 'POST', 'PUT'])
 def message():
     username = database.get_user_email(request)
     if username == 'Guest':
         return redirect(url_for('login_page'))
     
-    doc = database.cred_collection.find_one({'email': username})
+    doc = database.find_user(username)
     if 'new_username' in doc:
-            username = doc['new_username']
+        username = doc['new_username']
             
     load_messages = list(database.chat_collection.find()) #load message from data base into list
-    return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
+    return render_template('message.html', username=username, messages=load_messages) #render message along with username to the update ones
     
     
 @socketio.on("chat_message")
 def user_input(message):
     username = database.get_user_email(request)
     doc = database.cred_collection.find_one({'email': username})
-    get_photo_path = ""
+    get_photo_path = "./static/profile_images/default.png"
     if 'photo_path' in doc:
         get_photo_path = doc['photo_path']
-    else:
-        get_photo_path = "./static/profile_images/default.png"
         
     sender = message["sender"]
     messages = (message["message"])
     database.chat_collection.insert_one({"username": sender, "message": messages, "profile_pic": get_photo_path})
-    emit("load_chat", {"username": sender, "message": messages, "profile_pic": get_photo_path},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
+    emit("load_chat", {"username": sender, "message": messages, "profile_pic": get_photo_path}, broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
+################## message function end ##################
 
 @app.route('/profile', methods=['POST','GET'])
 def profile():
@@ -271,14 +246,12 @@ def profile():
     if user_email == 'Guest':
         return redirect(url_for('login_page'))
     
-    doc = database.cred_collection.find_one({'email': user_email})
+    doc = database.find_user(user_email)
     
-    get_photo_path = "Nothing"
+    get_photo_path = "./static/profile_images/default.png"
     if request.method == "GET":
         if 'photo_path' in doc:
             get_photo_path = doc['photo_path']
-        else:
-            get_photo_path = "./static/profile_images/default.png"
             
         if 'new_username' in doc:
             user_email = doc['new_username']
@@ -291,7 +264,7 @@ def profile():
             photo_header = photo.read(64)
             photo.seek(0)
             pnghex = "89504E470D0A1A0A"
-            png =bytes.fromhex(pnghex)
+            png = bytes.fromhex(pnghex)
 
             im_type = ''
             if photo_header.startswith(b'\xFF\xD8'): #jpeg&jpg
@@ -299,18 +272,16 @@ def profile():
             elif photo_header.startswith(png): #png
                 im_type = '.png'
 
-            filename = 'profile_pic_'+str(doc['id'])+im_type
+            filename = 'profile_pic_' + user_email + im_type
             path = os.path.join('./static/profile_images',filename)
             photo.save(path)
-
-            database.cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'photo_path':path}})
+            database.update_user_doc({"email":user_email}, {'photo_path': path})
 
             return redirect(url_for('profile'))
         
         elif 'username' in request.form:
             new_name = request.form.get('username')
-            database.cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'new_username':new_name}})
-                    
+            database.update_user_doc({"email":user_email}, {'new_username': new_name})        
             return redirect(url_for('profile'))
 
 if __name__ == '__main__':

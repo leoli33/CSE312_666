@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
     <link rel="stylesheet" type="text/css" href="/static/css/login.css">
     <link rel="shortcut icon" type="image/x-icon" href="/static/icons/logo.png">
 </head>
@@ -15,21 +15,37 @@
             <h3>Please sign up</h3>
 
             <form method="POST" action = "/signup">
-
-                <input class="box_login" type="text" name = "email" placeholder="Email Address"><br>
-                <input class="box_login" type="password" name="password" placeholder="Password"><br>
-                <input class="box_login" type="password" name="password_confirm" placeholder="Confirm Password"><br>
-                <br>
-                <p class="tip"> tips: length should be over than 8.</p>
-                <br>
+                <input class="box_login" type="text" name = "email" placeholder="Email Address" required><br>
+                <input class="box_login" type="password" name="password" placeholder="Password" required><br>
+                <input class="box_login" type="password" name="password_confirm" placeholder="Confirm Password" required><br>
+                    
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <ul class=flashes>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+                
+                <ul>
+                    <li>
+                        <p class="tip">Use at least 8 characters</p>
+                    </li>
+                    <li>
+                        <p class="tip">Include letters (upper & lower case)</p>
+                    </li>
+                    <li>
+                        <p class="tip">Include numbers</p>
+                    </li>
+                    <li>
+                        <p class="tip">Include symbols: !@#$%^&()-_=</p>
+                    </li>
+                </ul>
                 <input class="button_signup" type="submit" value="Sign Up">
             
             </form>
-
-
-
-            
-
 
             </div>
 
