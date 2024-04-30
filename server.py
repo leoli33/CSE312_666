@@ -49,7 +49,7 @@ def signup():
         
     #success
     hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-    user = {"email": email, "password": hashed_pw}
+    user = {"email": email, "password": hashed_pw, 'id': database.get_id()}
     database.add_user(user)
     
     return redirect(url_for('login_page'))
@@ -272,7 +272,7 @@ def profile():
             elif photo_header.startswith(png): #png
                 im_type = '.png'
 
-            filename = 'profile_pic_' + user_email + im_type
+            filename = 'profile_pic_'+str(doc['id'])+im_type
             path = os.path.join('./static/profile_images',filename)
             photo.save(path)
             database.update_user_doc({"email":user_email}, {'photo_path': path})

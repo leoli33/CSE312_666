@@ -6,8 +6,13 @@ db = mongo_client["CSE312_666"]
 chat_collection = db["Chat_room"]
 posts_collection = db["Posts"]
 replies_collection = db['Replies']
-cred_collection = db["cred"] # keys: email, password
-    
+cred_collection = db["cred"] # keys: email, password, photo_path, new_username, auth_token, id
+id_collection = db["unique_id"]
+
+def get_id():
+   doc = id_collection.find_one_and_update({}, {"$inc": {"id": 1}}, upsert=True, return_document=True)
+   return doc["id"]
+
 def valid_login(email: str, password: str):
     cred = cred_collection.find_one({"email": email})
     if cred == None:
