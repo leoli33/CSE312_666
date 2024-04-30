@@ -83,7 +83,7 @@ def logout():
 
 def invalid_char(entry: str):
     # does not contain any invalid characters
-    allowed_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&()-_=")
+    allowed_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&()-_=.")
     if set(entry) - allowed_chars != set():
         return True
     return False
