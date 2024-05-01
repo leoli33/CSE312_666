@@ -6,6 +6,8 @@ from datetime import datetime
 from util import database
 import pymongo, bcrypt, os, secrets, hashlib
 
+# posts_collection.delete_many({})
+
 app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app,cors_allowed_origins="*",transports=['websocket'])
@@ -224,8 +226,30 @@ def my_posts():
             post['last_reply_time'] = post['posting_time']
     return render_template('my_posts.html', posts=user_posts)
 
-################## message function start ##################
-@app.route('/message', strict_slashes=False, methods=['GET', 'POST', 'PUT'])
+@app.route('/search', methods=['GET'])
+def search():
+    search_result = request.args.get('search', '')
+    search_result = search_result.replace("&amp;","&")
+    search_result = search_result.replace("&lt;","<")
+    search_result = search_result.replace("&gt;",">")
+
+    if search_result != '' and search_result != None:
+
+        regex = {'$regex': search_result, '$options': 'i'}
+        search_results = list(database.get_all_post_raw().find({'title': regex}))
+
+        for post in search_results:
+            content = post.get('content', '')
+            post['content_preview'] = content.split('\n')[0] if content else ''
+            post['posting_time'] = post.get('_id').generation_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+        return render_template('post.html', posts=search_results)
+    else: 
+        return redirect("/explore")
+    
+##################posting function##################
+
+@app.route('/message', methods=['GET', 'POST', 'PUT'])
 def message():
     username = database.get_user_email(request)
     if username == 'Guest':
@@ -241,7 +265,6 @@ def message():
 
 
     return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
-    
     
 @socketio.on("chat_message")
 def user_input(message):

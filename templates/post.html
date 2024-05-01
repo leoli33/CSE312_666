@@ -6,6 +6,14 @@
     <link rel="stylesheet" type="text/css" href="/static/css/post.css">
     <div class="container">
         <h1>Explore</h1>
+
+        <form action="/search" method="get" class="search-form">
+            <input type="text" name="search" placeholder="Search posts by title :)" class="search-input">
+            <button type="submit" class="search">Search</button>
+            <a href="/explore" ><button type="button" class="search">Clear</button></a>
+        </form>
+        
+        <button class="clear-posts-button" id="clearPostsButton" onclick="clearPosts()">X</button>
         <div id="myNewThreadSidebar" class="new-thread-sidebar">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNewThreadSidebar()">&times;</a>
             <form id="newThreadForm">
