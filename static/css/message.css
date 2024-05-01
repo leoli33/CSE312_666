@@ -62,9 +62,11 @@ body {
     box-shadow: 1px 1px 5px lightgray;
 }
 
+.name_container {
+    display: flex;
+}
 .username {
     font-weight: bold;
-    display: flex;
     margin-bottom: 5px;
 }
 

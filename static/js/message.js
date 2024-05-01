@@ -31,8 +31,13 @@ socket.on("load_chat", function(data) {
     const imgElement = document.createElement('img');
     imgElement.src = profilePic;
     imgElement.classList.add('profile-pic');
-    usernameElement.appendChild(imgElement);
-    messageDiv.appendChild(usernameElement);
+
+    const nameElement = document.createElement('div')
+    nameElement.classList.add('name_container')
+    nameElement.appendChild(imgElement);
+    nameElement.appendChild(usernameElement);
+
+    messageDiv.appendChild(nameElement);
     messageDiv.appendChild(messageElement);
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
