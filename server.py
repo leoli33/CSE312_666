@@ -241,8 +241,21 @@ def search():
         for post in search_results:
             content = post.get('content', '')
             post['content_preview'] = content.split('\n')[0] if content else ''
-            post['posting_time'] = post.get('_id').generation_time.strftime('%Y-%m-%dT%H:%M:%SZ')
-
+            
+            if 'timestamp' in post:
+                post['posting_time'] = post['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
+            else:
+                post['posting_time'] = post['_id'].generation_time.strftime('%Y-%m-%dT%H:%M:%SZ') 
+            
+            last_reply = database.replies_collection.find_one(
+                {'threadId': ObjectId(post['_id'])}, 
+                sort=[('timestamp', pymongo.DESCENDING)]
+            )
+            if last_reply:
+                post['last_reply_time'] = last_reply['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
+            else:
+                post['last_reply_time'] = post['posting_time']
+            
         return render_template('post.html', posts=search_results)
     else: 
         return redirect("/explore")
