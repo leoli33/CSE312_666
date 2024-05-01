@@ -222,7 +222,7 @@ def search():
     if search_result != '' and search_result != None:
 
         regex = {'$regex': search_result, '$options': 'i'}
-        search_results = list(posts_collection.find({'title': regex}))
+        search_results = list(database.get_all_post_raw().find({'title': regex}))
 
         for post in search_results:
             content = post.get('content', '')
