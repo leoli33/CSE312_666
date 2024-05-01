@@ -32,11 +32,10 @@
     cursor: pointer;
     z-index: 10;
 }
-.clickable-title {
-    cursor: pointer;
-}
+
 
 .post-summary {
+    cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 4px;
     display: flex;
@@ -113,7 +112,6 @@
     box-shadow: 0 -2px 5px rgba(0,0,0,0.5); 
 }
 
-
 /* new thread side bar modification */
 .new-thread-sidebar form {
     display: flex;
@@ -144,4 +142,33 @@
 }
 .new-thread-sidebar button:hover {
     background-color: rgb(255, 133, 192);
+}
+
+.search-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.search-input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 50%;
+    max-width: 600px;
+}
+
+.search, .clear{
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: rgb(255, 133, 192);
+    color: white;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
 }
