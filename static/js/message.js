@@ -20,15 +20,19 @@ socket.on("load_chat", function(data) {
     
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message-container');
-    const messageElement = document.createElement('default');
-    messageElement.textContent = sender + ": " + message;
+    const usernameElement = document.createElement('div');
+    usernameElement.classList.add('username');
+    usernameElement.textContent = sender
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+    messageElement.textContent = message;
 
     // Create and append the image element
     const imgElement = document.createElement('img');
     imgElement.src = profilePic;
     imgElement.classList.add('profile-pic');
     messageDiv.appendChild(imgElement);
-
+    messageDiv.appendChild(usernameElement);
     messageDiv.appendChild(messageElement);
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;

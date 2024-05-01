@@ -48,7 +48,7 @@ body {
 
 .message-container {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 10px;
 }
 
@@ -60,4 +60,16 @@ body {
     object-fit: cover; 
     aspect-ratio: 1 / 1;
     box-shadow: 1px 1px 5px lightgray;
+}
+
+.username {
+    font-weight: bold;
+}
+
+.message {
+    flex-grow: 1;
+    margin-left: 10px;
+    background-color: #f0f0f0;
+    padding: 6px;
+    border-radius: 5px;
 }
