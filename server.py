@@ -186,7 +186,7 @@ def post_detail(post_id):
         for reply in replies_data:
             # Add author_email or username to reply object
             reply['author'] = reply.get('author', 'Unknown author')
-            reply['timestamp'] = reply['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
+            reply['timestamp'] = reply['timestamp']
             replies.append(reply)
         return render_template('reply.html', post=post_data, author=author_email, replies=replies)
     else:
