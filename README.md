@@ -13,7 +13,7 @@ Project part 3 additional feature testing procedure:
 5. Make 2 posts with unique title, but exists some common substring
     1. ei. Title abc and title bcd
 6. Make another post that had no common substring title as the 2 previous posts made
-    1. ei. Title abc and title def
+    1. ei. Title efg
 7. Verify all posts are shown in the explore
 8. Enter a common substring of only two of the posts 
     1. ei. Title abc and title bcd has common substring bc
