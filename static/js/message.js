@@ -31,7 +31,7 @@ socket.on("load_chat", function(data) {
     const imgElement = document.createElement('img');
     imgElement.src = profilePic;
     imgElement.classList.add('profile-pic');
-    messageDiv.appendChild(imgElement);
+    usernameElement.appendChild(imgElement);
     messageDiv.appendChild(usernameElement);
     messageDiv.appendChild(messageElement);
     chatMessages.appendChild(messageDiv);
