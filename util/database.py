@@ -48,3 +48,6 @@ def update_user_doc(key:dict, new_key:dict):
     
 def get_all_post():
     return list(posts_collection.find())
+
+def get_all_post_raw():
+    return posts_collection
