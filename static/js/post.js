@@ -148,31 +148,31 @@ document.querySelectorAll('.time-ago').forEach(function(element) {
 });
 
 //////////////////DEBUG CLEAR POST////////////////////
-function clearPosts() {
-    if(confirm('Are you sure you want to clear all threads? This cannot be undone.')) {
-        fetch('/clear-posts', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.result === 'success') {
-                // Remove all post-summary elements
-                const summaries = document.querySelectorAll('.post-summary');
-                summaries.forEach(summary => summary.remove());
-                alert('All threads have been cleared.');
-                window.location.reload(); // Refresh the page
-            } else {
-                console.error('Failed to clear the threads.');
-            }
-        })
-        .catch(error => {
-            console.error('Network error:', error);
-        });
-    }
-}
+// function clearPosts() {
+//     if(confirm('Are you sure you want to clear all threads? This cannot be undone.')) {
+//         fetch('/clear-posts', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             }
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             if(data.result === 'success') {
+//                 // Remove all post-summary elements
+//                 const summaries = document.querySelectorAll('.post-summary');
+//                 summaries.forEach(summary => summary.remove());
+//                 alert('All threads have been cleared.');
+//                 window.location.reload(); // Refresh the page
+//             } else {
+//                 console.error('Failed to clear the threads.');
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Network error:', error);
+//         });
+//     }
+// }
 ///////////////////Profile Sidebar ////////////////////
 function toggleProfileSidebar() {
     var ProfileSidebar = document.getElementById("mySidebar");

@@ -4,7 +4,7 @@ from flask_socketio import SocketIO, emit
 from bson import ObjectId
 from datetime import datetime
 from util import database
-import pymongo, bcrypt, os, secrets, hashlib
+import pymongo, bcrypt, os, secrets, hashlib, pytz
 
 # posts_collection.delete_many({})
 
@@ -190,7 +190,7 @@ def submit_reply():
     reply_id = database.replies_collection.insert_one({
         'threadId': ObjectId(thread_id),
         'content': str(content),
-        'timestamp': datetime.utcnow(),
+        'timestamp': datetime.now(pytz.timezone('UTC')).strftime('%Y-%m-%d %H:%M:%S'),
         'author': author_email
     }).inserted_id
 

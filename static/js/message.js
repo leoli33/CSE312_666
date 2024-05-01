@@ -1,7 +1,7 @@
 //const socket = io({transports:['websocket']});
 const socket = io('wss://cupid-666.me', { path: '/socket.io', transports: ['websocket'] });
 const chatMessages = document.getElementById("chat-messages");
-const clearButton = document.getElementById("clear-button");
+// const clearButton = document.getElementById("clear-button");
 const chatForm = document.getElementById('chat-form');
 
 chatForm.addEventListener('submit',function(event) {
@@ -34,8 +34,8 @@ socket.on("load_chat", function(data) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 });
 
-clearButton.addEventListener('click', function() {
-    while (chatMessages.firstChild) {
-        chatMessages.removeChild(chatMessages.firstChild);
-    }
-});
+// clearButton.addEventListener('click', function() {
+//     while (chatMessages.firstChild) {
+//         chatMessages.removeChild(chatMessages.firstChild);
+//     }
+// });
