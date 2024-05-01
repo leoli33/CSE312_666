@@ -4,7 +4,7 @@ from flask_socketio import SocketIO, emit
 from bson import ObjectId
 from datetime import datetime
 from util import database
-import pymongo, bcrypt, os, secrets, hashlib, pytz
+import pymongo, bcrypt, os, secrets, hashlib, pytz, re
 
 # posts_collection.delete_many({})
 
@@ -41,7 +41,7 @@ def signup():
         flash('Email already existed.', 'info')
         return redirect(url_for('signup_page'))
     
-    if len(password) < 8 or invalid_char(password):
+    if invalid_password(password):
         flash('Invalid password.', 'info')
         return redirect(url_for('signup_page'))
         
@@ -90,6 +90,22 @@ def invalid_char(entry: str):
         return True
     return False
 
+def invalid_password(password: str):
+    if len(password) < 8:
+        return True
+    
+    # at least 1 lowercase letter
+    if re.search("[a-z]", password) == None:
+        return True
+    
+    # at least 1 uppercase letter
+    if re.search("[A-Z]", password) == None:
+        return True
+    
+    # at least 1 number
+    if  re.search("[0-9]", password) == None:
+        return True
+    
 ################## post function start ##################
 @app.route('/explore')
 def posts_list_html():
