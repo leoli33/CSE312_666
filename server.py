@@ -134,6 +134,20 @@ def submit_post():
     post_id = database.posts_collection.insert_one({'title': str(title), 'content': str(content), 'author': author_email}).inserted_id
     return jsonify({'result': 'success', 'post_id': str(post_id), 'author_email': author_email})
 
+@app.route('/delete-post/<post_id>', methods=['DELETE'])
+def delete_post(post_id):
+    try:
+        user_email = database.get_user_email(request)
+        post_data = database.posts_collection.find_one({'_id': ObjectId(post_id), 'author': user_email})
+        if not post_data:
+            return jsonify({'status': 'error', 'message': 'Post not found or user unauthorized'}), 404
+        database.posts_collection.delete_one({'_id': ObjectId(post_id)})
+        database.replies_collection.delete_many({'threadId': ObjectId(post_id)})
+        return jsonify({'status': 'success', 'message': 'Post deleted successfully'})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': 'Failed to delete post'}), 500
+
 @app.route('/clear-posts', methods=['POST'])
 def clear_posts():
     try:

@@ -32,10 +32,11 @@
     cursor: pointer;
     z-index: 10;
 }
-
+.clickable-title {
+    cursor: pointer;
+}
 
 .post-summary {
-    cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 4px;
     display: flex;

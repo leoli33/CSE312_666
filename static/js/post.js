@@ -1,4 +1,8 @@
 
+function navigateToPost(postId) {
+    window.location.href = '/posts/' + postId;
+}
+
 document.addEventListener('DOMContentLoaded', (event) => {
     document.querySelectorAll('.time-ago').forEach(function(element) {
         var timestamp = element.getAttribute('data-timestamp');
@@ -11,7 +15,53 @@ document.addEventListener('DOMContentLoaded', (event) => {
             element.textContent = 'some time ago';
         }
     });
+
+
+    document.querySelectorAll('.post-summary').forEach(post => {
+        const postingTime = new Date(post.getAttribute('data-posting-time'));
+        const now = new Date();
+        const timeDifference = now - postingTime;
+        console.log(timeDifference);
+        if (timeDifference < 60000) { // 60000 ms = 1 minute
+            const recallBtn = post.querySelector('.recall-btn');
+            recallBtn.style.display = 'block';
+    
+            setTimeout(() => {
+                recallBtn.style.display = 'none';
+            }, 60000 - timeDifference);
+        }
+    });
+
+    const postsContainer = document.getElementById('posts-container');
+
+    postsContainer.addEventListener('click', function(event) {
+        if (event.target.classList.contains('recall-btn')) {
+            event.stopPropagation(); 
+            const postId = event.target.getAttribute('data-post-id');
+    
+            fetch(`/delete-post/${postId}`, {
+                method: 'DELETE', 
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Post recalled successfully.');
+                    event.target.closest('.post-summary').remove();
+                } else {
+                    alert('Failed to recall the post: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error, failed to recall the post.');
+            });
+        }
+    });
 });
+
 
 document.getElementById("newThreadForm").addEventListener("submit", function(event) {
     event.preventDefault();
@@ -38,22 +88,28 @@ document.getElementById("newThreadForm").addEventListener("submit", function(eve
         if(data.result === 'success') {
             var newPostSummary = document.createElement("div");
             var authorEmail = data.author_email || 'Unknown';
+            const now = new Date();
             newPostSummary.className = "post-summary";
-            newPostSummary.setAttribute('data-posting-time', new Date().toISOString()); 
+            newPostSummary.setAttribute('data-posting-time', new Date().toISOString());
             var contentPreview = content.slice(0, 10);
+
             newPostSummary.innerHTML = `
                 <div>
-                    <h3>${title}</h3>
+                    <h3 onclick="navigateToPost('${data.post_id}')" style="cursor:pointer;">${title}</h3>
                     <p>${contentPreview}... - Posted by: ${authorEmail}</p>
+                    <button class="recall-btn" data-post-id="${data.post_id}" style="display: none;">Recall</button>
                 </div>
                 <div class="post-last-reply-time">
                     <small>Last reply: <span class="time-ago">just now</span></small>
                 </div>
             `;
-            newPostSummary.onclick = function() {
-                window.location.href = '/posts/' + data.post_id;
-            };
             document.getElementById("posts-container").appendChild(newPostSummary);
+            const recallBtn = newPostSummary.querySelector('.recall-btn');
+            recallBtn.style.display = 'block';
+            setTimeout(() => {
+                recallBtn.style.display = 'none';
+            }, 60000);
+
             document.getElementById("newThreadTitle").value = '';
             document.getElementById("newThreadContent").value = '';
             closeNewThreadSidebar();

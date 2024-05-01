@@ -16,10 +16,12 @@
         </div>
         <div id="posts-container" class="post-container-top-space">
             {% for post in posts %}
-            <div class="post-summary" data-posting-time="{{ post.posting_time }}" onclick="location.href='/posts/{{ post._id }}'">
+            <div class="post-summary" data-posting-time="{{ post.posting_time }}">
                 <div>
-                    <h3>{{ post.title }}</h3>
+                    <h3 class="clickable-title" onclick="location.href='/posts/{{ post._id }}'">{{ post.title }}</h3>
                     <p>{{ post.content_preview[:10] }} - Posted by: {{ post.author }}</p>
+                    <button class="recall-btn" data-post-id="{{ post._id }}" style="display: none;">Recall</button>
+
                 </div>
                 {% if post.last_reply_time %}
                 <div class="post-last-reply-time">
