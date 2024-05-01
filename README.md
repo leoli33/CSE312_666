@@ -30,5 +30,3 @@ Project part 3 additional feature testing procedure:
 19. Verify step 8 to 15 again
 20. Clear search again
 21. Make sure all four posts are showing
-22. Now enter each post’s full title in the search bar once at a time and hit clear after each search
-23. Make sure only the post that matches the exact title shows
