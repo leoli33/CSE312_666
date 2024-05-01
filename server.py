@@ -186,7 +186,7 @@ def post_detail(post_id):
         for reply in replies_data:
             # Add author_email or username to reply object
             reply['author'] = reply.get('author', 'Unknown author')
-            reply['timestamp'] = reply['timestamp']
+            reply['timestamp'] = reply['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
             replies.append(reply)
         return render_template('reply.html', post=post_data, author=author_email, replies=replies)
     else:
@@ -206,7 +206,7 @@ def submit_reply():
     reply_id = database.replies_collection.insert_one({
         'threadId': ObjectId(thread_id),
         'content': str(content),
-        'timestamp': datetime.now(pytz.timezone('UTC')).strftime('%Y-%m-%d %H:%M:%S'),
+        'timestamp': datetime.now(pytz.timezone('UTC')),
         'author': author_email
     }).inserted_id
 
