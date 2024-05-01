@@ -249,7 +249,7 @@ def search():
     
 ##################posting function##################
 
-@app.route('/message', methods=['GET', 'POST', 'PUT'])
+@app.route('/message', strict_slashes=False, methods=['GET', 'POST', 'PUT'])
 def message():
     username = database.get_user_email(request)
     if username == 'Guest':
