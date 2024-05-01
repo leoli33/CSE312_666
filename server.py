@@ -206,10 +206,10 @@ def submit_reply():
     reply_id = database.replies_collection.insert_one({
         'threadId': ObjectId(thread_id),
         'content': str(content),
-        'timestamp': datetime.now(pytz.timezone('UTC')),
         'author': author_email
     }).inserted_id
-
+    reply = database.replies_collection.find_one({'threadId': ObjectId(thread_id)})
+    database.replies_collection.update_one({'threadId': ObjectId(thread_id)}, {"$set": reply['_id'].generation_time.strftime('%Y-%m-%dT%H:%M:%SZ') })
     if reply_id:
         return jsonify({'result': 'success', 'reply_id': str(reply_id), 'author_email': author_email})
     else:
