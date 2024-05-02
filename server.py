@@ -4,9 +4,7 @@ from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
-import pymongo, bcrypt, string, random
-import os
-import time
+import pymongo, bcrypt, string, random, os, time
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["CSE312_666"]
@@ -339,13 +337,22 @@ def profile():
             photo_header = photo.read(64)
             photo.seek(0)
             pnghex = "89504E470D0A1A0A"
+            gifhex1 = "474946383761"
+            gifhex2 = "474946383961"
             png =bytes.fromhex(pnghex)
+            gif1 =bytes.fromhex(gifhex1)
+            gif2 =bytes.fromhex(gifhex2)
 
             im_type = ''
             if photo_header.startswith(b'\xFF\xD8'): #jpeg&jpg
                 im_type = '.jpeg'
             elif photo_header.startswith(png): #png
                 im_type = '.png'
+            elif photo_header.startwith(gif1):   #gif
+                im_type = ".gif"
+            elif photo_header.startwith(gif2):   #gif
+                im_type = ".gif"
+            
 
             filename = 'profile_pic_'+str(doc['id'])+im_type
             path = os.path.join('./static/profile_images',filename)
