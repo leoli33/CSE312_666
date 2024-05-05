@@ -19,6 +19,16 @@
                 <input class="box_login" type="text" name = "email" placeholder="Email Address"><br>
                 <input class="box_login" type="password" name="password" placeholder="Password"><br>
 
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <ul class=flashes>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+                
                 <br>
                 <input type="checkbox" id="rm" name="rm" />
                 <label for="rm">Remember Me</label>

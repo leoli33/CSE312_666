@@ -12,14 +12,13 @@
             {% for message in messages %} <!--load messages from database-->
             <div class="message-container">
                 <img src="{{ message.profile_pic }}" class="profile-pic">
-                <default>{{ message.username }}: {{ message.message }}</default> <!--in this format-->
+                <div class="username">{{ message.username }}</div> <div class="message">{{ message.message }}</div>
             </div>
             {% endfor %}
         </div>
         <form id="chat-form">
             <input type="text" id="chat-input" placeholder="Type your message here...">
             <button type="submit" id="send-button">Send</button>
-            <button type="button" id="clear-button">Clear Messages</button>
         </form>
     </div>
     <script>

@@ -6,7 +6,13 @@
     <link rel="stylesheet" type="text/css" href="/static/css/post.css">
     <div class="container">
         <h1>Explore</h1>
-        <button class="clear-posts-button" id="clearPostsButton" onclick="clearPosts()">X</button>
+
+        <form action="/search" method="get" class="search-form">
+            <input type="text" name="search" placeholder="Search posts by title :)" class="search-input">
+            <button type="submit" class="search">Search</button>
+            <a href="/explore" ><button type="button" class="search">Clear</button></a>
+        </form>
+        
         <div id="myNewThreadSidebar" class="new-thread-sidebar">
             <a href="javascript:void(0)" class="closebtn" onclick="closeNewThreadSidebar()">&times;</a>
             <form id="newThreadForm">
@@ -17,10 +23,12 @@
         </div>
         <div id="posts-container" class="post-container-top-space">
             {% for post in posts %}
-            <div class="post-summary" data-posting-time="{{ post.posting_time }}" onclick="location.href='/posts/{{ post._id }}'">
+            <div class="post-summary" data-posting-time="{{ post.posting_time }}">
                 <div>
-                    <h3>{{ post.title }}</h3>
+                    <h3 class="clickable-title" onclick="location.href='/posts/{{ post._id }}'">{{ post.title }}</h3>
                     <p>{{ post.content_preview[:10] }} - Posted by: {{ post.author }}</p>
+                    <button class="recall-btn" data-post-id="{{ post._id }}" style="display: none;">Recall</button>
+
                 </div>
                 {% if post.last_reply_time %}
                 <div class="post-last-reply-time">

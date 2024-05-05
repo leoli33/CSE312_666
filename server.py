@@ -1,38 +1,17 @@
 
-from flask import Flask, request, render_template, send_from_directory, jsonify, redirect, url_for, flash, make_response
+from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, make_response
 from flask_socketio import SocketIO, emit
-from pymongo import MongoClient
 from bson import ObjectId
 from datetime import datetime
-import pymongo, bcrypt, string, random, os, time
-
-mongo_client = MongoClient("mongo")
-db = mongo_client["CSE312_666"]
-chat_collection = db["Chat_room"]
-posts_collection = db["Posts"]
-replies_collection = db['Replies']
-cred_collection = db["cred"]
+from util import database
+import pymongo, bcrypt, os, secrets, hashlib, pytz, re, os, time
 
 app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app,cors_allowed_origins="*",transports=['websocket'])
-
-#cred_collection.delete_many({})
-#chat_collection.delete_many({})
-
 temp_block_list = {}
 current_ip_access = {}
 
-
-def get_user_email():
-    auth_cook = request.cookies.get('auth_token')
-
-    if auth_cook != None and auth_cook != "":
-        for doc in cred_collection.find({},{'_id' : False}):
-
-            if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
-                return doc["email"]
-    return 'Guest'
     
 @app.before_request #Do this before every request happens
 def DOS_limit():
@@ -73,93 +52,101 @@ def security(response):
 
 @app.route('/')
 def home():
-    user_email = get_user_email()
+    user_email = database.get_user_email(request)
     return render_template('index.html', user_email=user_email)
 
+################## auth function start ##################
 @app.route('/signup_page')
 def signup_page():
-     return render_template('register.html')
+    return render_template('register.html')
 
 @app.route('/signup', methods=['POST'])
 def signup():
+    email = str(request.form['email'])
+    password = str(request.form['password'])
+    confirm_pass = str(request.form['password_confirm'])
 
-    if request.method == 'POST':
-
-        email = str(request.form['email'])
-        password = str(request.form['password'])
-        confirm_pass = str(request.form['password_confirm'])
-
-        id = 0
-        for ele in cred_collection.find():
-            if 'id' in ele:
-                if ele['id'] > id:
-                    id = int(ele['id'])
-        id = id + 1
-
-
-        if cred_collection.find_one({'email': email}) or email == 'Guest': #check email exists
-          
-            return render_template('register.html')
-        else:
-
-            if password != confirm_pass: #password does not match
-                return render_template('register.html')
-            
-            else: #success
-                hashed_pass = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-                cred_collection.insert_one({"email":email,"password":hashed_pass,'id':id})
-                return redirect(url_for('login_page'))
+    if '@' not in email or invalid_char(email):
+        flash('This is not an email.', 'info')
+        return redirect(url_for('signup_page'))
+    
+    if database.find_user(email): #check email exists
+        flash('Email already existed.', 'info')
+        return redirect(url_for('signup_page'))
+    
+    if invalid_password(password):
+        flash('Invalid password.', 'info')
+        return redirect(url_for('signup_page'))
         
+    if password != confirm_pass: #password does not match
+        flash('Passwords do not match.', 'info')
+        return redirect(url_for('signup_page'))
+        
+    #success
+    hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+    user = {"email": email, "password": hashed_pw, 'id': database.get_id()}
+    database.add_user(user)
+    
+    return redirect(url_for('login_page'))
+
 @app.route('/login_page')
 def login_page():
     return render_template('login.html')
-
+    
 @app.route('/login', methods=['POST'])
 def login():
-    if request.method == 'POST':
+    email = str(request.form['email'])
+    password = str(request.form['password'])
 
-        email = str(request.form['email'])
-        password = str(request.form['password'])
+    if database.valid_login(email, password):
+        token = secrets.token_urlsafe()
+        hashed_token = hashlib.sha256(token.encode()).hexdigest()
+        database.update_user_doc({"email": email}, {"token": hashed_token})
+        response = make_response(redirect(url_for('home')))
+        response.set_cookie('auth_token', token, max_age = 3600, httponly = True, secure=True)
+        return response
+    
+    flash('Login failed.', 'info')   
+    return redirect(url_for('login_page')) #login failed
 
-        for doc in cred_collection.find({},{'_id' : False}):
-
-            if email == doc["email"] and bcrypt.checkpw(password.encode(),doc["password"]): #can log in
-
-                N = 20
-                auth_tok = ''.join(random.choices(string.ascii_uppercase + string.digits + string.ascii_lowercase, k=N))
-                hashed_token = bcrypt.hashpw(auth_tok.encode(), bcrypt.gensalt())
-
-                cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id']}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],"auth_token": hashed_token}})
-
-                response = make_response(redirect(url_for('home')))
-                response.set_cookie('auth_token', auth_tok, max_age = 3600, httponly = True)
-                return response
-            
-        return redirect(url_for('login_page')) #login failed
-
-@app.route('/logout',methods = ['POST','GET'])
+@app.route('/logout')
 def logout():
-    if request.method == "GET":
+    database.delete_token(request)
+    response = make_response(redirect(url_for('login_page')))
+    response.set_cookie('auth_token', "", expires = 0, httponly = True, secure=True)
+    return response
 
-        auth_cook = request.cookies.get('auth_token')
+def invalid_char(entry: str):
+    # does not contain any invalid characters
+    allowed_chars = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&()-_=.")
+    if set(entry) - allowed_chars != set():
+        return True
+    return False
 
-        for doc in cred_collection.find({},{'_id' : False}):
-
-            if "auth_token" in doc.keys() and doc["auth_token"] != '' and bcrypt.checkpw(auth_cook.encode(),doc["auth_token"]):
-
-                cred_collection.update_one({"email":doc["email"] ,"password":doc["password"],'id':doc['id'],"auth_token":doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"],'id':doc["id"], "auth_token": ""}})
-                response = make_response(redirect(url_for('home')))
-                response.set_cookie('auth_token', "", expires = 0, httponly = True)
-                return response
-
-##################post function##################
+def invalid_password(password: str):
+    if len(password) < 8:
+        return True
+    
+    # at least 1 lowercase letter
+    if re.search("[a-z]", password) == None:
+        return True
+    
+    # at least 1 uppercase letter
+    if re.search("[A-Z]", password) == None:
+        return True
+    
+    # at least 1 number
+    if  re.search("[0-9]", password) == None:
+        return True
+    
+################## post function start ##################
 @app.route('/explore')
 def posts_list_html():
-    user_email = get_user_email()
+    user_email = database.get_user_email(request)
     if user_email == 'Guest':
         return redirect(url_for('login_page'))
     
-    all_posts = list(posts_collection.find())
+    all_posts = database.get_all_post()
     for post in all_posts:
         content = post.get('content', '')
         post['content_preview'] = content.split('\n')[0] if content else ''
@@ -169,7 +156,7 @@ def posts_list_html():
         else:
             post['posting_time'] = post['_id'].generation_time.strftime('%Y-%m-%dT%H:%M:%SZ') 
         
-        last_reply = replies_collection.find_one(
+        last_reply = database.replies_collection.find_one(
             {'threadId': ObjectId(post['_id'])}, 
             sort=[('timestamp', pymongo.DESCENDING)]
         )
@@ -184,7 +171,7 @@ def submit_post():
     data = request.json
     title = data['title']
     content = data['content']
-    author_email = get_user_email()
+    author_email = database.get_user_email(request)
 
     title = title.replace("&amp;","&")
     title = title.replace("&lt;","<")
@@ -195,14 +182,28 @@ def submit_post():
     content = content.replace("&gt;",">")
 
     # print("Author email at post submission:", author_email) 
-    post_id = posts_collection.insert_one({'title': str(title), 'content': str(content), 'author': author_email}).inserted_id
+    post_id = database.posts_collection.insert_one({'title': str(title), 'content': str(content), 'author': author_email}).inserted_id
     return jsonify({'result': 'success', 'post_id': str(post_id), 'author_email': author_email})
+
+@app.route('/delete-post/<post_id>', methods=['DELETE'])
+def delete_post(post_id):
+    try:
+        user_email = database.get_user_email(request)
+        post_data = database.posts_collection.find_one({'_id': ObjectId(post_id), 'author': user_email})
+        if not post_data:
+            return jsonify({'status': 'error', 'message': 'Post not found or user unauthorized'}), 404
+        database.posts_collection.delete_one({'_id': ObjectId(post_id)})
+        database.replies_collection.delete_many({'threadId': ObjectId(post_id)})
+        return jsonify({'status': 'success', 'message': 'Post deleted successfully'})
+    except Exception as e:
+        print(e)
+        return jsonify({'status': 'error', 'message': 'Failed to delete post'}), 500
 
 @app.route('/clear-posts', methods=['POST'])
 def clear_posts():
     try:
-        posts_collection.delete_many({})
-        replies_collection.delete_many({})
+        database.posts_collection.delete_many({})
+        database.replies_collection.delete_many({})
         return jsonify({'result': 'success'})
     except Exception as e:
         print(e)
@@ -210,10 +211,10 @@ def clear_posts():
 
 @app.route('/posts/<post_id>')
 def post_detail(post_id):
-    post_data = posts_collection.find_one({'_id': ObjectId(post_id)})
+    post_data = database.posts_collection.find_one({'_id': ObjectId(post_id)})
     if post_data:
         author_email = post_data.get('author', 'Unknown author')
-        replies_data = replies_collection.find({'threadId': ObjectId(post_id)})
+        replies_data = database.replies_collection.find({'threadId': ObjectId(post_id)})
         replies = []
         for reply in replies_data:
             # Add author_email or username to reply object
@@ -224,23 +225,21 @@ def post_detail(post_id):
     else:
         return "Post not found", 404
 
-
-
 @app.route('/submit-reply', methods=['POST'])
 def submit_reply():
     data = request.json
     thread_id = data['threadId']
     content = data['content']
-    author_email = get_user_email()
+    author_email = database.get_user_email(request)
 
     content = content.replace("&amp;","&")
     content = content.replace("&lt;","<")
     content = content.replace("&gt;",">")
 
-    reply_id = replies_collection.insert_one({
+    reply_id = database.replies_collection.insert_one({
         'threadId': ObjectId(thread_id),
         'content': str(content),
-        'timestamp': datetime.utcnow(),
+        'timestamp': datetime.now(pytz.timezone('UTC')),
         'author': author_email
     }).inserted_id
 
@@ -249,14 +248,13 @@ def submit_reply():
     else:
         return jsonify({'result': 'error', 'message': 'Failed to insert reply'}), 500
 
-    
 @app.route('/my_posts')
 def my_posts():
-    user_email = get_user_email()
+    user_email = database.get_user_email(request)
     if user_email == 'Guest':
         return redirect(url_for('login_page'))
     
-    user_posts = list(posts_collection.find({'author': user_email}))
+    user_posts = list(database.posts_collection.find({'author': user_email}))
 
     for post in user_posts:
         content = post.get('content', '')
@@ -267,7 +265,7 @@ def my_posts():
         else:
             post['posting_time'] = post['_id'].generation_time.strftime('%Y-%m-%dT%H:%M:%SZ') 
         
-        last_reply = replies_collection.find_one(
+        last_reply = database.replies_collection.find_one(
             {'threadId': ObjectId(post['_id'])}, 
             sort=[('timestamp', pymongo.DESCENDING)]
         )
@@ -277,54 +275,85 @@ def my_posts():
             post['last_reply_time'] = post['posting_time']
     return render_template('my_posts.html', posts=user_posts)
 
+@app.route('/search', methods=['GET'])
+def search():
+    search_result = request.args.get('search', '')
+    search_result = search_result.replace("&amp;","&")
+    search_result = search_result.replace("&lt;","<")
+    search_result = search_result.replace("&gt;",">")
 
+    if search_result != '' and search_result != None:
+
+        regex = {'$regex': search_result, '$options': 'i'}
+        search_results = list(database.get_all_post_raw().find({'title': regex}))
+
+        for post in search_results:
+            content = post.get('content', '')
+            post['content_preview'] = content.split('\n')[0] if content else ''
+            
+            if 'timestamp' in post:
+                post['posting_time'] = post['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
+            else:
+                post['posting_time'] = post['_id'].generation_time.strftime('%Y-%m-%dT%H:%M:%SZ') 
+            
+            last_reply = database.replies_collection.find_one(
+                {'threadId': ObjectId(post['_id'])}, 
+                sort=[('timestamp', pymongo.DESCENDING)]
+            )
+            if last_reply:
+                post['last_reply_time'] = last_reply['timestamp'].strftime('%Y-%m-%dT%H:%M:%SZ')
+            else:
+                post['last_reply_time'] = post['posting_time']
+            
+        return render_template('post.html', posts=search_results)
+    else: 
+        return redirect("/explore")
+    
 ##################posting function##################
+
 @app.route('/message', strict_slashes=False, methods=['GET', 'POST', 'PUT'])
 def message():
-    username = get_user_email()
+    username = database.get_user_email(request)
     if username == 'Guest':
         return redirect(url_for('login_page'))
     
-    user_doc = cred_collection.find_one({'email': username})
-    user_id = user_doc.get('id')
+    user_doc = database.find_user(username)
 
-    load_messages = list(chat_collection.find())
+    load_messages = list(database.chat_collection.find())
     for message in load_messages:
-        user_doc = cred_collection.find_one({'id': message['user_id']})
+        user_doc = database.cred_collection.find_one({'id': message['user_id']})
         message['username'] = user_doc.get('new_username', user_doc['email'])
         message['profile_pic'] = user_doc.get('photo_path', './static/profile_images/default.png').replace('./','/')
 
 
     return render_template('message.html', username=username, messages = load_messages) #render message along with username to the update ones
     
-    
 @socketio.on("chat_message")
 def user_input(message):
-    username = get_user_email()
-    user_doc  = cred_collection.find_one({'email': username})
+    username = database.get_user_email(request)
+    user_doc = database.find_user(username)
     user_id = user_doc.get('id')
     current_avatar_path = user_doc.get('photo_path', './static/profile_images/default.png').replace('./', '/')
 
     sender = message["sender"]
     messages = (message["message"])
-    chat_collection.insert_one({"user_id": user_id,"message": messages})
+    database.chat_collection.insert_one({"user_id": user_id,"message": messages})
     emit("load_chat", {"username": sender, "message": messages,"profile_pic": current_avatar_path},broadcast=True) #when load chat is broadcast can show allow other users to update their messages
     print(message)
+################## message function end ##################
 
 @app.route('/profile', methods=['POST','GET'])
 def profile():
-    user_email = get_user_email()
+    user_email = database.get_user_email(request)
     if user_email == 'Guest':
         return redirect(url_for('login_page'))
     
-    doc = cred_collection.find_one({'email': user_email})
+    doc = database.find_user(user_email)
     
-    get_photo_path = "Nothing"
+    get_photo_path = "./static/profile_images/default.png"
     if request.method == "GET":
         if 'photo_path' in doc:
             get_photo_path = doc['photo_path']
-        else:
-            get_photo_path = "./static/profile_images/default.png"
             
         if 'new_username' in doc:
             user_email = doc['new_username']
@@ -357,15 +386,13 @@ def profile():
             filename = 'profile_pic_'+str(doc['id'])+im_type
             path = os.path.join('./static/profile_images',filename)
             photo.save(path)
-
-            cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'photo_path':path}})
+            database.update_user_doc({"email":user_email}, {'photo_path': path})
 
             return redirect(url_for('profile'))
         
         elif 'username' in request.form:
             new_name = request.form.get('username')
-            cred_collection.update_one({"email":doc["email"], "password":doc["password"],'id':doc['id'],'auth_token':doc["auth_token"]}, {"$set":{"email" : doc["email"],  "password" : doc["password"], 'id':doc['id'],'auth_token':doc["auth_token"],'new_username':new_name}})
-                    
+            database.update_user_doc({"email":user_email}, {'new_username': new_name})        
             return redirect(url_for('profile'))
 
 if __name__ == '__main__':
