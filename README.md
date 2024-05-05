@@ -12,13 +12,13 @@ Project part 3 additional feature testing procedure:
 4. Navigate to explore on the top of right hand side
 5. Make 2 posts with unique title, but exists some common substring
     1. ei. Title abc and title bcd
-6. Make another post that had no common substring title as the 2 previous posts made
+6. Make another post that had no common substring title as the 2 previous posts made in either browser
     1. ei. Title efg
-7. Verify all posts are shown in the explore
-8. Enter a common substring of only two of the posts 
+7. Refresh both browsers and verify all posts are shown in the explore
+8. Enter a common substring of only two of the posts on top of the browser
     1. ei. Title abc and title bcd has common substring bc
 9. Click Search
-10. Verify that only the two posts are displayed
+10. Verify that only the two posts that had the words in it are displayed
 11. Click Clear
 12. Make sure all posts are displayed
 13. Now enter a substring of the post title made in step 6 into search bar
@@ -26,7 +26,3 @@ Project part 3 additional feature testing procedure:
 15. Make sure only post made in step 6 is showing
 16. Click Clear
 17. Make sure all three posts are showing
-18. Make another post with no common substring title of the all three posts made above
-19. Verify step 8 to 15 again
-20. Clear search again
-21. Make sure all four posts are showing
