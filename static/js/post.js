@@ -208,12 +208,12 @@ function closeChatSidebar() {
 ///////////////////Thread Sidebar ////////////////////
 function toggleNewThreadSidebar() {
     var newThreadSidebar = document.getElementById("myNewThreadSidebar");
-    if (newThreadSidebar.style.height === "35%") {
+    if (newThreadSidebar.style.height === "55%") {
         newThreadSidebar.style.height = "0"; 
         newThreadSidebar.style.paddingTop = "0";
         newThreadSidebar.style.boxShadow = "none"; 
     } else {
-        newThreadSidebar.style.height = "35%"; 
+        newThreadSidebar.style.height = "55%"; 
         newThreadSidebar.style.display = "block";
         newThreadSidebar.style.paddingTop = "10px";
         newThreadSidebar.style.boxShadow = "0 -2px 5px rgba(0,0,0,0.5)"; 
