@@ -9,41 +9,58 @@ import pymongo, bcrypt, os, secrets, hashlib, pytz, re, os, time
 app = Flask(__name__)
 app.secret_key = '4d56sad5a1c23xs'
 socketio = SocketIO(app,cors_allowed_origins="*",transports=['websocket'])
-temp_block_list = {}
-current_ip_access = {}
+# temp_block_list = {}
+# current_ip_access = {}
 
-    
+# Rate limit settings
+REQUEST_LIMIT = 50
+WINDOW_PERIOD = 10  # in seconds
+BLOCK_PERIOD = 30  # in seconds
+
+ip_request = {}
+
 @app.before_request #Do this before every request happens
 def DOS_limit():
-    current_ip = "me" #need to put the current usser ip in here needs to get real IP address from NGINX @LJM
-    if current_ip in temp_block_list: #if IP is already in block list reject any access until hes out
-        current_time = time.time()
-        while current_time < temp_block_list[current_ip].get("Entered_time"): 
-            print("check time passed", current_time)
-            print("block time", temp_block_list)
-            return " Too Many Requests, try Again in 30 seconds", 429
-        del temp_block_list[current_ip] #out of blocklist after 30 seconds
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    return f'The real IP address is: {ip}'
 
-    if current_ip in current_ip_access: 
-        current_t = time.time()
-        if current_t - current_ip_access[current_ip].get("Entered_time") < 10: #calculate the count for every 10 seconds
-            current_ip_access[current_ip]["access_count"] = current_ip_access[current_ip].get("access_count") + 1
-            print(current_ip_access, "the current")
-            if current_ip_access[current_ip]["access_count"] > 50: #within the 10 second if the user accessed more than 50 time add it to the block list
-                block_list_time = time.time() + 30 #the time needed to be in the block list
-                temp_block_list[current_ip] = {"Entered_time": block_list_time}
-                del current_ip_access[current_ip]
-                return "try Again in 30 seconds, Too Many Requests", 429
-        else:
-            time_after_reset = time.time()
-            current_ip_access[current_ip] = {"Entered_time": time_after_reset, "access_count": 1} #reset every 10 seconds
-            print(current_ip_access, 'check reset')
+    ip = request.remote_addr
+    current_time = time.time()
+    
+    # increase count for this ip
+    if ip in ip_request:
+        ip_request[ip]['count'] += 1
     else:
-        first_accessed_time = time.time()
-        current_ip_access[current_ip] = {"Entered_time": first_accessed_time, "access_count": 1}  #add the user in during first access
-        print(current_ip_access, "first accessed")
+        ip_request[ip] = {'count': 1, 'timestamp': current_time}
+    
+    # if current_ip in temp_block_list: #if IP is already in block list reject any access for 30s
+    #     current_time = time.time()
+    #     while current_time < temp_block_list[current_ip].get("Entered_time"): 
+    #         print("check time passed", current_time)
+    #         print("block time", temp_block_list)
+    #         return "Too Many Requests, try Again in 30 seconds", 429
+    #     del temp_block_list[current_ip] #out of blocklist after 30 seconds
 
-    print(current_ip_access, "the current ip")
+    # if current_ip in current_ip_access: 
+    #     current_t = time.time()
+    #     if current_t - current_ip_access[current_ip].get("Entered_time") < 10: #calculate the count for every 10 seconds
+    #         current_ip_access[current_ip]["access_count"] = current_ip_access[current_ip].get("access_count") + 1
+    #         print(current_ip_access, "the current")
+    #         if current_ip_access[current_ip]["access_count"] > 50: #within the 10 second if the user accessed more than 50 time add it to the block list
+    #             block_list_time = time.time() + 30 #the time needed to be in the block list
+    #             temp_block_list[current_ip] = {"Entered_time": block_list_time}
+    #             del current_ip_access[current_ip]
+    #             return "try Again in 30 seconds, Too Many Requests", 429
+    #     else:
+    #         time_after_reset = time.time()
+    #         current_ip_access[current_ip] = {"Entered_time": time_after_reset, "access_count": 1} #reset every 10 seconds
+    #         print(current_ip_access, 'check reset')
+    # else:
+    #     first_accessed_time = time.time()
+    #     current_ip_access[current_ip] = {"Entered_time": first_accessed_time, "access_count": 1}  #add the user in during first access
+    #     print(current_ip_access, "first accessed")
+
+    # print(current_ip_access, "the current ip")
 
 @app.after_request
 def security(response):
